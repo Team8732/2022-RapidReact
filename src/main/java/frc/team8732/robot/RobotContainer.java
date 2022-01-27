@@ -4,8 +4,6 @@
 
 package frc.team8732.robot;
 
-import edu.wpi.first.wpilibj2.command.Command;
-
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -13,6 +11,15 @@ import edu.wpi.first.wpilibj2.command.Command;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  private static RobotContainer mInstance;
+
+  public synchronized static RobotContainer getInstance() {
+    if (mInstance == null) {
+        mInstance = new RobotContainer();
+    }
+
+    return mInstance;
+  }
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -26,14 +33,4 @@ public class RobotContainer {
    * Use this method to define your button-> command mappings.
    */
   private void configureButtonBindings() {}
-
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-
-  public Command getAutonomousCommand() {
-    return null;
-  }
 }
