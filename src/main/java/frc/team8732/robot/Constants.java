@@ -21,6 +21,10 @@ public class Constants {
     public static final int kDriveGamepadPort = 0;
     public static final int kButtonGamepadPort = 1;
 
+    // Controller Deadband
+    public static final double kDriveThrottleDeadband = 0.02;
+    public static final double kDriveWheelDeadband = 0.035;
+
     // Drive
     public static final int kLeftDriveMasterId = 5;
     public static final int kLeftDriveSlaveAId = 6;
