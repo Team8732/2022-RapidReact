@@ -53,8 +53,7 @@ public class Drive extends Subsystem {
     private DriveMotionPlanner mMotionPlanner;
     private boolean mOverrideTrajectory = false;
 
-    private int kPIDSlot = 0;
-    private int kPositionPIDSlot = 1;
+    private final int kPIDSlot = 0;
 
     public synchronized static Drive getInstance() {
         if (mInstance == null) {
@@ -84,6 +83,7 @@ public class Drive extends Subsystem {
         TalonUtil.checkError(talon.config_kD(kPIDSlot, Constants.kDriveKd, Constants.kLongCANTimeoutMs), "Could not set velocity kd");
         TalonUtil.checkError(talon.config_kF(kPIDSlot, Constants.kDriveKf, Constants.kLongCANTimeoutMs), "Could not set velocity kf");
 
+        int kPositionPIDSlot = 1;
         TalonUtil.checkError(talon.config_kP(kPositionPIDSlot, Constants.kDrivePositionKp, Constants.kLongCANTimeoutMs), "Could not set position kp");
         TalonUtil.checkError(talon.config_kI(kPositionPIDSlot, Constants.kDrivePositionKi, Constants.kLongCANTimeoutMs), "Could not set position ki");
         TalonUtil.checkError(talon.config_kD(kPositionPIDSlot, Constants.kDrivePositionKd, Constants.kLongCANTimeoutMs), "Could not set position kd");
@@ -249,7 +249,7 @@ public class Drive extends Subsystem {
                         case JOYSTICK:
                             driveWithJoystick();
                         default:
-                            System.out.println("unexpected drive control state: " + mDriveControlState);
+                            System.out.println("unexpected drive control state: " + getControlState());
                             break;
                     }
                 }

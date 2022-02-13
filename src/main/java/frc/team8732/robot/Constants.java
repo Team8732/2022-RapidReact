@@ -36,7 +36,6 @@ public class Constants {
     // Drive ratio.
     public static final double kDriveEncoderPPR = 4096.0;
     public static final double kDriveGearReduction = 50.0 / 13.0 * 44.0 / 30.0;
-    public static final double kDriveRotationsPerTick = 1.0 / kDriveEncoderPPR * 1.0 / kDriveGearReduction; // ticks * kDriveRotationsPerTickGear = wheel rotations
     public static final double kGearRatioScalar = (1.0 / (50.0 / 13.0 * 44.0 / 30.0)) / (1.0 / kDriveGearReduction); // TODO Check Scalar
 
     // Wheel parameters.
