@@ -26,7 +26,7 @@ public class OpenLoopCheesyDriveHelper {
         throttle = Util.handleDeadband(throttle, Constants.kDriveThrottleDeadband);
         wheel = Util.handleDeadband(wheel, Constants.kDriveWheelDeadband);
 
-        // Apply a sin function that's scaled to make it feel better.
+        // Apply a sin function that's scaled to make turning feel better for driver.
         if (!quickTurn) {
             wheel = Math.sin(Math.PI / 2.0 * kWheelNonlinearity * wheel);
             wheel = Math.sin(Math.PI / 2.0 * kWheelNonlinearity * wheel);
