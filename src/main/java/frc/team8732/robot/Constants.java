@@ -21,6 +21,10 @@ public class Constants {
     public static final int kDriveGamepadPort = 0;
     public static final int kButtonGamepadPort = 1;
 
+    // Controller Deadband
+    public static final double kDriveThrottleDeadband = 0.02;
+    public static final double kDriveWheelDeadband = 0.035;
+
     // Drive
     public static final int kLeftDriveMasterId = 5;
     public static final int kLeftDriveSlaveAId = 6;
@@ -32,7 +36,6 @@ public class Constants {
     // Drive ratio.
     public static final double kDriveEncoderPPR = 4096.0;
     public static final double kDriveGearReduction = 50.0 / 13.0 * 44.0 / 30.0;
-    public static final double kDriveRotationsPerTick = 1.0 / kDriveEncoderPPR * 1.0 / kDriveGearReduction; // ticks * kDriveRotationsPerTickGear = wheel rotations
     public static final double kGearRatioScalar = (1.0 / (50.0 / 13.0 * 44.0 / 30.0)) / (1.0 / kDriveGearReduction); // TODO Check Scalar
 
     // Wheel parameters.

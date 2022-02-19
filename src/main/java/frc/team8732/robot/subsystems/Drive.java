@@ -26,9 +26,12 @@ import frc.team8732.lib.trajectory.TrajectoryIterator;
 import frc.team8732.lib.trajectory.timing.TimedState;
 import frc.team8732.lib.util.DriveOutput;
 import frc.team8732.lib.util.DriveSignal;
+import frc.team8732.lib.util.OpenLoopCheesyDriveHelper;
 import frc.team8732.lib.util.ReflectingCSVWriter;
 import frc.team8732.robot.Constants;
+import frc.team8732.robot.RobotContainer;
 import frc.team8732.robot.RobotState;
+import frc.team8732.robot.controller.GameController;
 import frc.team8732.robot.loops.ILooper;
 import frc.team8732.robot.loops.Loop;
 import frc.team8732.robot.planners.DriveMotionPlanner;
@@ -50,8 +53,7 @@ public class Drive extends Subsystem {
     private DriveMotionPlanner mMotionPlanner;
     private boolean mOverrideTrajectory = false;
 
-    private int kPIDSlot = 0;
-    private int kPositionPIDSlot = 1;
+    private final int kPIDSlot = 0;
 
     public synchronized static Drive getInstance() {
         if (mInstance == null) {
@@ -65,7 +67,7 @@ public class Drive extends Subsystem {
         // General
         TalonUtil.checkError(talon.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10, Constants.kLongCANTimeoutMs), "Could not set talon status frame period");
         talon.setInverted(!left);
-        TalonUtil.checkError(talon.configForwardSoftLimitEnable(false), "Could not set foward soft limit");
+        TalonUtil.checkError(talon.configForwardSoftLimitEnable(false), "Could not set forward soft limit");
         TalonUtil.checkError(talon.configReverseSoftLimitEnable(false), "Could not set reverse soft limit");
 
         // Encoder 
@@ -81,16 +83,17 @@ public class Drive extends Subsystem {
         TalonUtil.checkError(talon.config_kD(kPIDSlot, Constants.kDriveKd, Constants.kLongCANTimeoutMs), "Could not set velocity kd");
         TalonUtil.checkError(talon.config_kF(kPIDSlot, Constants.kDriveKf, Constants.kLongCANTimeoutMs), "Could not set velocity kf");
 
+        int kPositionPIDSlot = 1;
         TalonUtil.checkError(talon.config_kP(kPositionPIDSlot, Constants.kDrivePositionKp, Constants.kLongCANTimeoutMs), "Could not set position kp");
         TalonUtil.checkError(talon.config_kI(kPositionPIDSlot, Constants.kDrivePositionKi, Constants.kLongCANTimeoutMs), "Could not set position ki");
         TalonUtil.checkError(talon.config_kD(kPositionPIDSlot, Constants.kDrivePositionKd, Constants.kLongCANTimeoutMs), "Could not set position kd");
         TalonUtil.checkError(talon.config_kF(kPositionPIDSlot, Constants.kDrivePositionKf, Constants.kLongCANTimeoutMs), "Could not set position kf");
 
-        // Sensor Velo Measure
+        // Sensor Velocity Measure
         TalonUtil.checkError(talon.configVelocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_50Ms, Constants.kLongCANTimeoutMs), "could not config drive velocity measurement period");
         TalonUtil.checkError(talon.configVelocityMeasurementWindow(1, Constants.kLongCANTimeoutMs), "could not config drive velocity measurement window");
 
-        // Volatage Comp
+        // Voltage Comp
         TalonUtil.checkError(talon.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs), "Could not config drive voltage comp saturation");
         talon.enableVoltageCompensation(true);
     }
@@ -166,6 +169,14 @@ public class Drive extends Subsystem {
         public TimedState<Pose2dWithCurvature> path_setpoint = new TimedState<Pose2dWithCurvature>(Pose2dWithCurvature.identity());
     }
 
+    public synchronized DriveControlState getControlState() {
+        return mDriveControlState;
+    }
+
+    public synchronized void setControlState(DriveControlState controlState) {
+        this.mDriveControlState = controlState;
+    }
+
     @Override
     public synchronized void readPeriodicInputs() {
         mPeriodicIO.timestamp = Timer.getFPGATimestamp();
@@ -182,18 +193,10 @@ public class Drive extends Subsystem {
         mPeriodicIO.gyro_heading = Rotation2d.fromDegrees(mPigeon.getFusedHeading()).rotateBy(mGyroOffset);
 
         double deltaLeftTicks = ((mPeriodicIO.left_position_ticks - prevLeftTicks) / Constants.kDriveEncoderPPR) * Math.PI;
-        if (deltaLeftTicks > 0.0) {
-            mPeriodicIO.left_distance += deltaLeftTicks * Constants.kDriveWheelDiameterInches;
-        } else {
-            mPeriodicIO.left_distance += deltaLeftTicks * Constants.kDriveWheelDiameterInches;
-        }
+        mPeriodicIO.left_distance += deltaLeftTicks * Constants.kDriveWheelDiameterInches;
 
         double deltaRightTicks = ((mPeriodicIO.right_position_ticks - prevRightTicks) / Constants.kDriveEncoderPPR) * Math.PI;
-        if (deltaRightTicks > 0.0) {
-            mPeriodicIO.right_distance += deltaRightTicks * Constants.kDriveWheelDiameterInches;
-        } else {
-            mPeriodicIO.right_distance += deltaRightTicks * Constants.kDriveWheelDiameterInches;
-        }
+        mPeriodicIO.right_distance += deltaRightTicks * Constants.kDriveWheelDiameterInches;
 
         mPeriodicIO.left_velocity_ticks_per_100ms = mLeftMaster.getSelectedSensorVelocity(0);
         mPeriodicIO.right_velocity_ticks_per_100ms = mRightMaster.getSelectedSensorVelocity(0);
@@ -243,8 +246,10 @@ public class Drive extends Subsystem {
                         case PATH_FOLLOWING:
                             updatePathFollower();
                             break;
+                        case JOYSTICK:
+                            driveWithJoystick();
                         default:
-                            System.out.println("unexpected drive control state: " + mDriveControlState);
+                            System.out.println("unexpected drive control state: " + getControlState());
                             break;
                     }
                 }
@@ -258,7 +263,7 @@ public class Drive extends Subsystem {
         });
     }
 
-    // Drive Conversions 
+    // Drive Conversions
     public static double rotationsToInches(double rotations) {
         return rotations * (Constants.kDriveWheelDiameterInches * Math.PI);
     }
@@ -293,24 +298,24 @@ public class Drive extends Subsystem {
 
     // Drive Sensor Outputs
     public double getLeftEncoderRotations() {
-    return mPeriodicIO.left_position_ticks / Constants.kDriveEncoderPPR;
+        return mPeriodicIO.left_position_ticks / Constants.kDriveEncoderPPR;
     }
 
     public double getRightEncoderRotations() {
-    return mPeriodicIO.right_position_ticks / Constants.kDriveEncoderPPR;
+        return mPeriodicIO.right_position_ticks / Constants.kDriveEncoderPPR;
     }
 
     // TODO Check that the rotation + distance calculation is equal between methods
     public double getLeftWheelRotations() {
-    return getLeftEncoderRotations() / Constants.kDriveGearReduction;
+        return getLeftEncoderRotations() / Constants.kDriveGearReduction;
     }
 
     public double getRightWheelRotations() {
-    return getRightEncoderRotations() / Constants.kDriveGearReduction;
+        return getRightEncoderRotations() / Constants.kDriveGearReduction;
     }
 
     public double getLeftWheelDistanceInches() {
-        return rotationsToInches(getLeftWheelRotations());      
+        return rotationsToInches(getLeftWheelRotations());
     }
 
     public double getRightWheelDistanceInches() {
@@ -318,11 +323,11 @@ public class Drive extends Subsystem {
     }
 
     public double getLeftEncoderDistance() {
-        return mPeriodicIO.left_distance;     
+        return mPeriodicIO.left_distance;
     }
 
     public double getRightEncoderDistance() {
-        return mPeriodicIO.right_distance;  
+        return mPeriodicIO.right_distance;
     }
 
     public double getRightVelocityNativeUnits() {
@@ -450,6 +455,16 @@ public class Drive extends Subsystem {
         mRightMaster.selectProfileSlot(desired_slot_idx, 0);
     }
 
+    // Joystick Control
+    public synchronized void driveWithJoystick() {
+        GameController driverController = RobotContainer.getInstance().getDriveGameController();
+        double throttle = driverController.getLeftYAxis();
+        double wheel = driverController.getRightXAxis();
+        boolean quickTurn = driverController.getRightBumper().getAsBoolean();
+
+        setOpenLoop(OpenLoopCheesyDriveHelper.getInstance().cheesyDrive(throttle, wheel,quickTurn));
+    }
+
     // Brake State
     public boolean isBrakeMode() {
         return mIsBrakeMode;
@@ -492,7 +507,6 @@ public class Drive extends Subsystem {
         resetEncoders();
     }
 
-    // Poofs
     @Override
     public synchronized void stop() {
         setOpenLoop(DriveSignal.NEUTRAL);
@@ -511,11 +525,12 @@ public class Drive extends Subsystem {
             mCSVWriter = null;
         }
     }
-    
+
     public enum DriveControlState {
         OPEN_LOOP, // open loop voltage control,
         VELOCITY, // velocity control
-        PATH_FOLLOWING
+        PATH_FOLLOWING,
+        JOYSTICK
     }
 
     @Override

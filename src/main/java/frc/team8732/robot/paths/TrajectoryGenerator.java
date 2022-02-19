@@ -1,9 +1,5 @@
 package frc.team8732.robot.paths;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import frc.team8732.lib.geometry.Pose2d;
 import frc.team8732.lib.geometry.Pose2dWithCurvature;
 import frc.team8732.lib.geometry.Rotation2d;
@@ -14,20 +10,29 @@ import frc.team8732.lib.trajectory.timing.TimedState;
 import frc.team8732.lib.trajectory.timing.TimingConstraint;
 import frc.team8732.robot.planners.DriveMotionPlanner;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class TrajectoryGenerator {
+    private static TrajectoryGenerator mInstance;
+
+
     // TODO tune
     private static final double kMaxVel = 150.0;
     private static final double kMaxAccel = 100.0;
     private static final double kMaxVoltage = 9.0;
 
-    private static TrajectoryGenerator mInstance = new TrajectoryGenerator();
     private final DriveMotionPlanner mMotionPlanner;
     private TrajectorySet mTrajectorySet = null;
 
-    public static TrajectoryGenerator getInstance() {
+    public synchronized static TrajectoryGenerator getInstance() {
+        if (mInstance == null) {
+            mInstance = new TrajectoryGenerator();
+        }
+
         return mInstance;
     }
-
     private TrajectoryGenerator() {
         mMotionPlanner = new DriveMotionPlanner();
     }

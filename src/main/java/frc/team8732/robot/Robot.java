@@ -18,6 +18,7 @@ import frc.team8732.robot.loops.Looper;
 import frc.team8732.robot.paths.TrajectoryGenerator;
 import frc.team8732.robot.subsystems.Drive;
 import frc.team8732.robot.subsystems.RobotStateEstimator;
+import frc.team8732.robot.subsystems.Drive.DriveControlState;
 
 public class Robot extends TimedRobot {
   private final Looper mEnabledLooper = new Looper();
@@ -136,6 +137,8 @@ public class Robot extends TimedRobot {
       }
 
       mSubsystemManager.stop();
+
+      mDrive.setControlState(DriveControlState.JOYSTICK);
 
       mEnabledLooper.start();
 
