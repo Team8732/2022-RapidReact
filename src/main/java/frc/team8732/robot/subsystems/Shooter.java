@@ -7,7 +7,6 @@ package frc.team8732.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
-import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 
@@ -39,10 +38,19 @@ public class Shooter extends Subsystem {
 
     // Control States
     private ShooterControlState mShooterControlState;
+    private ShooterState mShooterState;
 
     public enum ShooterControlState {
         OPEN_LOOP,  // open loop voltage control 
         VELOCITY    // velocity control
+    }
+
+    public enum ShooterState {
+        OFF,      
+        PERCENT_OUTPUT,  
+        IDLE,           // Fixed shooter rate > 0 rpm to allow for quick shooter ramp
+        RAW_RPM,        // Set shooter rpm for known locations (not factoring in LL distance)
+        CALCULATED_RPM  // Set shooter rpm for unknown locations (uses LL + TreeMap to get ideal motor demand)
     }
 
     // Hardware States
@@ -105,6 +113,14 @@ public class Shooter extends Subsystem {
         this.mShooterControlState = controlState;
     }
 
+    public synchronized ShooterState getShooterState(){
+        return mShooterState;
+    }
+
+    public synchronized void setShooterState(ShooterState shooterState) {
+        this.mShooterState = shooterState;
+    }
+
     // Subsystem looper methods 
     @Override
     public void readPeriodicInputs() {
@@ -139,7 +155,30 @@ public class Shooter extends Subsystem {
             public void onStart(double timestamp) {}
 
             @Override
-            public void onLoop(double timestamp) {}
+            public void onLoop(double timestamp) {
+                synchronized (Shooter.this) {
+                    switch (mShooterState) {
+                        case OFF:
+                            // No looping calculations needed
+                            break;
+                        case PERCENT_OUTPUT:
+                            // No looping calculations needed
+                            break;
+                        case IDLE:
+                            // No looping calculations needed
+                            break;
+                        case RAW_RPM:
+                            // No looping calculations needed
+                            break;
+                        case CALCULATED_RPM:
+                            // calculateDesiredRPM (Via LL distance + Interpolating Map values) (Need LL subsystem done)
+                            break;
+                        default:
+                            System.out.println("unexpected shooter state: " + getShooterState());
+                            break;
+                    }
+                }
+            }
 
             @Override
             public void onStop(double timestamp) {
@@ -196,7 +235,7 @@ public class Shooter extends Subsystem {
     }
 
     public synchronized boolean isAtSetpoint() {
-        return Util.epsilonEquals(getRPM(), nativeUnitsToRPM(mPeriodicIO.demand),
+        return Util.epsilonEquals(getRPM(), getDemandRPM(),
                 Constants.kShooterAllowableErrorRPM);
     }
 

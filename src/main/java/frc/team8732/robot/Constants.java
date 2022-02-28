@@ -95,5 +95,5 @@ public class Constants {
     public static final double kShooterEncoderPPR = 4096.0;
     public static final double kShooterOutputToEncoderRatio = 1.0;
     public static final double kShooterTicksPerRevolution = kShooterOutputToEncoderRatio * kShooterEncoderPPR; // based on gear reduction between encoder and output shaft, and encoder ppr
-    public static final double kShooterAllowableErrorRPM = 250.0; // TODO
+    public static final double kShooterAllowableErrorRPM = 150.0; // TODO Tune for 2022 Upper Hub
 }
