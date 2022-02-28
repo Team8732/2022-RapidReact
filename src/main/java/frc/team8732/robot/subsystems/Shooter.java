@@ -66,7 +66,6 @@ public class Shooter extends Subsystem {
 
     private void configureMaster(TalonSRX talon){
         // General
-        TalonUtil.checkError(talon.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 20, Constants.kLongCANTimeoutMs), "Could not set shooter talon status frame period");
         talon.setInverted(InvertType.None);
 
         // Encoder 
