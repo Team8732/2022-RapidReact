@@ -96,4 +96,9 @@ public class Constants {
     public static final double kShooterOutputToEncoderRatio = 1.0;
     public static final double kShooterTicksPerRevolution = kShooterOutputToEncoderRatio * kShooterEncoderPPR; // based on gear reduction between encoder and output shaft, and encoder ppr
     public static final double kShooterAllowableErrorRPM = 150.0; // TODO Tune for 2022 Upper Hub
+
+    // Limelight TODO change values for 2022 bot
+    public static final double kGoalMaxHeightInches = 104.0; // Rotation Angle
+    public static final double kLimelightAngleHorizontalPlaneToLens = 30.0; // Rotation Angle
+    public static final double kLimelightLensOffGroundHeight = 42.0;        // Measurment from carpet to center or LL lense
 }
