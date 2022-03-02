@@ -37,20 +37,11 @@ public class Shooter extends Subsystem {
     private final TalonSRX mShooterMaster, mShooterSlave;
 
     // Control States
-    private ShooterControlState mShooterControlState;
-    private ShooterState mShooterState;
+    private ShooterControlState mShooterControlState = ShooterControlState.OPEN_LOOP;
 
     public enum ShooterControlState {
         OPEN_LOOP,  // open loop voltage control 
         VELOCITY    // velocity control
-    }
-
-    public enum ShooterState {
-        OFF,      
-        PERCENT_OUTPUT,  
-        IDLE,           // Fixed shooter rate > 0 rpm to allow for quick shooter ramp
-        RAW_RPM,        // Set shooter rpm for known locations (not factoring in LL distance)
-        CALCULATED_RPM  // Set shooter rpm for unknown locations (uses LL + TreeMap to get ideal motor demand)
     }
 
     // Hardware States
@@ -105,22 +96,6 @@ public class Shooter extends Subsystem {
         mShooterSlave.setInverted(InvertType.FollowMaster);
     }
 
-    public synchronized ShooterControlState getControlState() {
-        return mShooterControlState;
-    }
-
-    public synchronized void setControlState(ShooterControlState controlState) {
-        this.mShooterControlState = controlState;
-    }
-
-    public synchronized ShooterState getShooterState(){
-        return mShooterState;
-    }
-
-    public synchronized void setShooterState(ShooterState shooterState) {
-        this.mShooterState = shooterState;
-    }
-
     // Subsystem looper methods 
     @Override
     public void readPeriodicInputs() {
@@ -155,30 +130,7 @@ public class Shooter extends Subsystem {
             public void onStart(double timestamp) {}
 
             @Override
-            public void onLoop(double timestamp) {
-                synchronized (Shooter.this) {
-                    switch (mShooterState) {
-                        case OFF:
-                            // No looping calculations needed
-                            break;
-                        case PERCENT_OUTPUT:
-                            // No looping calculations needed
-                            break;
-                        case IDLE:
-                            // No looping calculations needed
-                            break;
-                        case RAW_RPM:
-                            // No looping calculations needed
-                            break;
-                        case CALCULATED_RPM:
-                            // calculateDesiredRPM (Via LL distance + Interpolating Map values) (Need LL subsystem done)
-                            break;
-                        default:
-                            System.out.println("unexpected shooter state: " + getShooterState());
-                            break;
-                    }
-                }
-            }
+            public void onLoop(double timestamp) {}
 
             @Override
             public void onStop(double timestamp) {
