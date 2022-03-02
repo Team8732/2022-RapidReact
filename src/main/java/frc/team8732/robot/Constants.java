@@ -98,7 +98,7 @@ public class Constants {
     public static final double kShooterAllowableErrorRPM = 150.0; // TODO Tune for 2022 Upper Hub
 
     // Limelight TODO change values for 2022 bot
-    public static final double kGoalMaxHeightInches = 104.0; // Rotation Angle
+    public static final double kGoalMaxHeightInches = 104.0; // Height from carpet to top of upper hub 
     public static final double kLimelightAngleHorizontalPlaneToLens = 30.0; // Rotation Angle
     public static final double kLimelightLensOffGroundHeight = 42.0;        // Measurment from carpet to center or LL lens
 }
