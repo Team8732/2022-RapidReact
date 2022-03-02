@@ -232,7 +232,7 @@ public class Limelight {
     }
 
     /**
-     * Gets the distance from the lense of the camera to the target.
+     * Gets the distance from the lens of the camera to the target.
      */
     public double getLimelightDistanceFromTarget(){
         double angleToGoalDegrees = Constants.kLimelightAngleHorizontalPlaneToLens + getTargetVertOffset();

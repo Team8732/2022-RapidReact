@@ -100,5 +100,5 @@ public class Constants {
     // Limelight TODO change values for 2022 bot
     public static final double kGoalMaxHeightInches = 104.0; // Rotation Angle
     public static final double kLimelightAngleHorizontalPlaneToLens = 30.0; // Rotation Angle
-    public static final double kLimelightLensOffGroundHeight = 42.0;        // Measurment from carpet to center or LL lense
+    public static final double kLimelightLensOffGroundHeight = 42.0;        // Measurment from carpet to center or LL lens
 }
