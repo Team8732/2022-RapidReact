@@ -36,24 +36,10 @@ import frc.team8732.robot.loops.ILooper;
 import frc.team8732.robot.loops.Loop;
 import frc.team8732.robot.planners.DriveMotionPlanner;
 
+/** This is the Drive subsystem for the 2022 robot. It contains all the information 
+ * (variables, constructors, methods etc.) in order to allow the drivetrain to function.*/
 public class Drive extends Subsystem {
     private static Drive mInstance;
-
-    // Hardware
-    private final TalonSRX mLeftMaster, mRightMaster, mLeftSlaveA, mRightSlaveA, mLeftSlaveB, mRightSlaveB;
-
-    // Control states
-    private DriveControlState mDriveControlState;
-    private PigeonIMU mPigeon;
-
-    // Hardware states
-    private boolean mIsBrakeMode;
-    private Rotation2d mGyroOffset = Rotation2d.identity();
-
-    private DriveMotionPlanner mMotionPlanner;
-    private boolean mOverrideTrajectory = false;
-
-    private final int kPIDSlot = 0;
 
     public synchronized static Drive getInstance() {
         if (mInstance == null) {
@@ -63,83 +49,28 @@ public class Drive extends Subsystem {
         return mInstance;
     }
 
-    private void configureMaster(TalonSRX talon, boolean left) {
-        // General
-        TalonUtil.checkError(talon.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10, Constants.kLongCANTimeoutMs), "Could not set talon status frame period");
-        talon.setInverted(!left);
-        TalonUtil.checkError(talon.configForwardSoftLimitEnable(false), "Could not set forward soft limit");
-        TalonUtil.checkError(talon.configReverseSoftLimitEnable(false), "Could not set reverse soft limit");
+    // Hardware
+    private final TalonSRX mLeftMaster, mRightMaster, mLeftSlaveA, mRightSlaveA, mLeftSlaveB, mRightSlaveB;
 
-        // Encoder 
-        final ErrorCode sensorPresent = talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 100); //primary closed-loop, 100 ms timeout
+    // Control states
+    private DriveControlState mDriveControlState;
+    private PigeonIMU mPigeon;
 
-        if (sensorPresent != ErrorCode.OK) {
-            DriverStation.reportError("Could not detect " + (left ? "left" : "right") + " encoder: " + sensorPresent, false);
-        }
-
-        // PID
-        TalonUtil.checkError(talon.config_kP(kPIDSlot, Constants.kDriveKp, Constants.kLongCANTimeoutMs), "Could not set velocity kp");
-        TalonUtil.checkError(talon.config_kI(kPIDSlot, Constants.kDriveKi, Constants.kLongCANTimeoutMs), "Could not set velocity ki");
-        TalonUtil.checkError(talon.config_kD(kPIDSlot, Constants.kDriveKd, Constants.kLongCANTimeoutMs), "Could not set velocity kd");
-        TalonUtil.checkError(talon.config_kF(kPIDSlot, Constants.kDriveKf, Constants.kLongCANTimeoutMs), "Could not set velocity kf");
-
-        int kPositionPIDSlot = 1;
-        TalonUtil.checkError(talon.config_kP(kPositionPIDSlot, Constants.kDrivePositionKp, Constants.kLongCANTimeoutMs), "Could not set position kp");
-        TalonUtil.checkError(talon.config_kI(kPositionPIDSlot, Constants.kDrivePositionKi, Constants.kLongCANTimeoutMs), "Could not set position ki");
-        TalonUtil.checkError(talon.config_kD(kPositionPIDSlot, Constants.kDrivePositionKd, Constants.kLongCANTimeoutMs), "Could not set position kd");
-        TalonUtil.checkError(talon.config_kF(kPositionPIDSlot, Constants.kDrivePositionKf, Constants.kLongCANTimeoutMs), "Could not set position kf");
-
-        // Sensor Velocity Measure
-        TalonUtil.checkError(talon.configVelocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_50Ms, Constants.kLongCANTimeoutMs), "could not config drive velocity measurement period");
-        TalonUtil.checkError(talon.configVelocityMeasurementWindow(1, Constants.kLongCANTimeoutMs), "could not config drive velocity measurement window");
-
-        // Voltage Comp
-        TalonUtil.checkError(talon.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs), "Could not config drive voltage comp saturation");
-        talon.enableVoltageCompensation(true);
+    public enum DriveControlState {
+        OPEN_LOOP, // open loop voltage control,
+        VELOCITY, // velocity control
+        PATH_FOLLOWING,
+        JOYSTICK
     }
 
-    private Drive() {
-        mPeriodicIO = new PeriodicIO();
+    // Hardware states
+    private boolean mIsBrakeMode;
+    private Rotation2d mGyroOffset = Rotation2d.identity();
 
-        // Start all Talons in open loop mode.
-        mLeftMaster = TalonSRXFactory.createDefaultTalon(Constants.kLeftDriveMasterId);
-        configureMaster(mLeftMaster, true);
+    private DriveMotionPlanner mMotionPlanner;
+    private boolean mOverrideTrajectory = false;
 
-        mLeftSlaveA = TalonSRXFactory.createPermanentSlaveTalon(Constants.kLeftDriveSlaveAId,
-                Constants.kLeftDriveMasterId);
-        mLeftSlaveA.setInverted(false);
-
-        mLeftSlaveB = TalonSRXFactory.createPermanentSlaveTalon(Constants.kLeftDriveSlaveBId,
-                Constants.kLeftDriveMasterId);
-        mLeftSlaveB.setInverted(false);
-
-        mRightMaster = TalonSRXFactory.createDefaultTalon(Constants.kRightDriveMasterId);
-        configureMaster(mRightMaster, false);
-
-        mRightSlaveA = TalonSRXFactory.createPermanentSlaveTalon(Constants.kRightDriveSlaveAId,
-                Constants.kRightDriveMasterId);
-        mRightSlaveA.setInverted(true);
-
-        mRightSlaveB = TalonSRXFactory.createPermanentSlaveTalon(Constants.kRightDriveSlaveBId,
-                Constants.kRightDriveMasterId);
-        mRightSlaveB.setInverted(true);
-
-        mPigeon = new PigeonIMU(mLeftSlaveB);
-        mLeftSlaveB.setStatusFramePeriod(StatusFrameEnhanced.Status_11_UartGadgeteer, 10, 10);
-
-        setOpenLoop(DriveSignal.NEUTRAL);
-
-        // Force a CAN message across.
-        mIsBrakeMode = true;
-        setBrakeMode(false);
-
-        mMotionPlanner = new DriveMotionPlanner();
-
-        zeroSensors();
-    }
-
-    private PeriodicIO mPeriodicIO;
-    private ReflectingCSVWriter<PeriodicIO> mCSVWriter = null;
+    private final int kPIDSlot = 0;
 
     public static class PeriodicIO {
         // MOTOR OUTPUT
@@ -169,6 +100,84 @@ public class Drive extends Subsystem {
         public TimedState<Pose2dWithCurvature> path_setpoint = new TimedState<Pose2dWithCurvature>(Pose2dWithCurvature.identity());
     }
 
+    private PeriodicIO mPeriodicIO;
+    private ReflectingCSVWriter<PeriodicIO> mCSVWriter = null;
+
+    private void configureMaster(TalonSRX talon, boolean left) {
+        // General
+        TalonUtil.checkError(talon.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10, Constants.kLongCANTimeoutMs), "Could not set talon status frame period");
+        talon.setInverted(!left);
+        TalonUtil.checkError(talon.configForwardSoftLimitEnable(false), "Could not set forward soft limit");
+        TalonUtil.checkError(talon.configReverseSoftLimitEnable(false), "Could not set reverse soft limit");
+
+        // Encoder 
+        final ErrorCode sensorPresent = talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, Constants.kLongCANTimeoutMs); //primary closed-loop, 100 ms timeout
+
+        if (sensorPresent != ErrorCode.OK) {
+            DriverStation.reportError("Could not detect " + (left ? "left" : "right") + " encoder: " + sensorPresent, false);
+        }
+
+        // PID
+        TalonUtil.checkError(talon.config_kP(kPIDSlot, Constants.kDriveKp, Constants.kLongCANTimeoutMs), "Could not set drive velocity kp");
+        TalonUtil.checkError(talon.config_kI(kPIDSlot, Constants.kDriveKi, Constants.kLongCANTimeoutMs), "Could not set drive velocity ki");
+        TalonUtil.checkError(talon.config_kD(kPIDSlot, Constants.kDriveKd, Constants.kLongCANTimeoutMs), "Could not set velocity kd");
+        TalonUtil.checkError(talon.config_kF(kPIDSlot, Constants.kDriveKf, Constants.kLongCANTimeoutMs), "Could not set velocity kf");
+
+        int kPositionPIDSlot = 1;
+        TalonUtil.checkError(talon.config_kP(kPositionPIDSlot, Constants.kDrivePositionKp, Constants.kLongCANTimeoutMs), "Could not set drive position kp");
+        TalonUtil.checkError(talon.config_kI(kPositionPIDSlot, Constants.kDrivePositionKi, Constants.kLongCANTimeoutMs), "Could not set drive position ki");
+        TalonUtil.checkError(talon.config_kD(kPositionPIDSlot, Constants.kDrivePositionKd, Constants.kLongCANTimeoutMs), "Could not set drive position kd");
+        TalonUtil.checkError(talon.config_kF(kPositionPIDSlot, Constants.kDrivePositionKf, Constants.kLongCANTimeoutMs), "Could not set drive position kf");
+
+        // Sensor Velocity Measure
+        TalonUtil.checkError(talon.configVelocityMeasurementPeriod(SensorVelocityMeasPeriod.Period_50Ms, Constants.kLongCANTimeoutMs), "Could not config drive velocity measurement period");
+        TalonUtil.checkError(talon.configVelocityMeasurementWindow(1, Constants.kLongCANTimeoutMs), "Could not config drive velocity measurement window");
+
+        // Voltage Comp
+        TalonUtil.checkError(talon.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs), "Could not config drive voltage comp saturation");
+        talon.enableVoltageCompensation(true);
+    }
+
+    private Drive() {
+        mPeriodicIO = new PeriodicIO();
+
+        // Start all Talons in open loop mode
+        mLeftMaster = TalonSRXFactory.createDefaultTalon(Constants.kLeftDriveMasterID);
+        configureMaster(mLeftMaster, true);
+
+        mLeftSlaveA = TalonSRXFactory.createPermanentSlaveTalon(Constants.kLeftDriveSlaveAID,
+                Constants.kLeftDriveMasterID);
+        mLeftSlaveA.setInverted(false);
+
+        mLeftSlaveB = TalonSRXFactory.createPermanentSlaveTalon(Constants.kLeftDriveSlaveBID,
+                Constants.kLeftDriveMasterID);
+        mLeftSlaveB.setInverted(false);
+
+        mRightMaster = TalonSRXFactory.createDefaultTalon(Constants.kRightDriveMasterID);
+        configureMaster(mRightMaster, false);
+
+        mRightSlaveA = TalonSRXFactory.createPermanentSlaveTalon(Constants.kRightDriveSlaveAID,
+                Constants.kRightDriveMasterID);
+        mRightSlaveA.setInverted(true);
+
+        mRightSlaveB = TalonSRXFactory.createPermanentSlaveTalon(Constants.kRightDriveSlaveBID,
+                Constants.kRightDriveMasterID);
+        mRightSlaveB.setInverted(true);
+
+        mPigeon = new PigeonIMU(mLeftSlaveB);
+        mLeftSlaveB.setStatusFramePeriod(StatusFrameEnhanced.Status_11_UartGadgeteer, 10, 10);
+
+        setOpenLoop(DriveSignal.NEUTRAL);
+
+        // Force a CAN message across.
+        mIsBrakeMode = true;
+        setBrakeMode(false);
+
+        mMotionPlanner = new DriveMotionPlanner();
+
+        zeroSensors();
+    }
+
     public synchronized DriveControlState getControlState() {
         return mDriveControlState;
     }
@@ -177,6 +186,7 @@ public class Drive extends Subsystem {
         this.mDriveControlState = controlState;
     }
 
+    // Subsystem looper methods 
     @Override
     public synchronized void readPeriodicInputs() {
         mPeriodicIO.timestamp = Timer.getFPGATimestamp();
@@ -224,14 +234,13 @@ public class Drive extends Subsystem {
     }
 
     @Override
-    public void registerEnabledLoops(ILooper in) {
-        in.register(new Loop() {
+    public void registerEnabledLoops(ILooper mEnabledLooper) {
+        mEnabledLooper.register(new Loop() {
             @Override
             public void onStart(double timestamp) {
                 synchronized (Drive.this) {
-                    stop();
                     setBrakeMode(true);
-                    startLogging();
+                    // startLogging();
                 }
             }
 
@@ -258,12 +267,12 @@ public class Drive extends Subsystem {
             @Override
             public void onStop(double timestamp) {
                 stop();
-                stopLogging();
+                // stopLogging();
             }
         });
     }
 
-    // Drive Conversions
+    // Drive conversions methods
     public static double rotationsToInches(double rotations) {
         return rotations * (Constants.kDriveWheelDiameterInches * Math.PI);
     }
@@ -296,7 +305,7 @@ public class Drive extends Subsystem {
         return rad_s / (Math.PI * 2.0) * Constants.kDriveEncoderPPR / 10.0;
     }
 
-    // Drive Sensor Outputs
+    // Drive accessor methods
     public double getLeftEncoderRotations() {
         return mPeriodicIO.left_position_ticks / Constants.kDriveEncoderPPR;
     }
@@ -370,6 +379,7 @@ public class Drive extends Subsystem {
         return (Math.abs(getLeftOutputVoltage()) + Math.abs(getRightOutputVoltage())) / 2.0;
     }
 
+    // Drive modifier methods
     /**
      * Configure talons for open loop control
      */
@@ -388,7 +398,6 @@ public class Drive extends Subsystem {
     }
 
     // Path Following
-
     /**
      * Configure talons for following via the ramsete controller
      */
@@ -524,13 +533,6 @@ public class Drive extends Subsystem {
             mCSVWriter.flush();
             mCSVWriter = null;
         }
-    }
-
-    public enum DriveControlState {
-        OPEN_LOOP, // open loop voltage control,
-        VELOCITY, // velocity control
-        PATH_FOLLOWING,
-        JOYSTICK
     }
 
     @Override
