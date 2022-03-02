@@ -4,6 +4,8 @@
 
 package frc.team8732.robot.subsystems;
 
+import frc.team8732.robot.Limelight;
+
 /** This is the Superstructrue subsystem. It takes instances from all other subsystem to 
  * create action states that the robot will take throughout the match and centralize them in one space */
 public class Superstructure extends Subsystem {
@@ -18,6 +20,7 @@ public class Superstructure extends Subsystem {
     }
 
     private Shooter mShooter = Shooter.getInstance();
+    private Limelight mLimelight = Limelight.getInstance();
 
     private Superstructure(){
     }

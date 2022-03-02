@@ -6,6 +6,7 @@ package frc.team8732.robot;
 
 import frc.team8732.robot.controller.GameController;
 import frc.team8732.robot.controller.Playstation;
+import frc.team8732.robot.subsystems.Superstructure;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -18,6 +19,8 @@ public class RobotContainer {
 
   private final GameController mDriver = new GameController(Constants.kDriveGamepadPort, new Playstation());
   private final GameController mOperator = new GameController(Constants.kButtonGamepadPort, new Playstation());
+
+  private final Superstructure mSuperstructure = Superstructure.getInstance();
 
   public synchronized static RobotContainer getInstance() {
     if (mInstance == null) {
