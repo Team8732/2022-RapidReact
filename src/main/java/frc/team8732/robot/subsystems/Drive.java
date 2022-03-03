@@ -465,13 +465,27 @@ public class Drive extends Subsystem {
     }
 
     // Joystick Control
+    public synchronized void setOpenLoopJoystick(DriveSignal signal) {
+        if (mDriveControlState != DriveControlState.JOYSTICK) {
+            setBrakeMode(true);
+            System.out.println("switching to open loop joystick");
+            System.out.println(signal);
+            mDriveControlState = DriveControlState.JOYSTICK;
+        }
+
+        mPeriodicIO.left_demand = signal.getLeft();
+        mPeriodicIO.right_demand = signal.getRight();
+        mPeriodicIO.left_feedforward = 0.0;
+        mPeriodicIO.right_feedforward = 0.0;
+    }
+
     public synchronized void driveWithJoystick() {
         GameController driverController = RobotContainer.getInstance().getDriveGameController();
         double throttle = driverController.getLeftYAxis();
         double wheel = driverController.getRightXAxis();
         boolean quickTurn = driverController.getRightBumper().getAsBoolean();
 
-        setOpenLoop(OpenLoopCheesyDriveHelper.getInstance().cheesyDrive(throttle, wheel,quickTurn));
+        setOpenLoopJoystick(OpenLoopCheesyDriveHelper.getInstance().cheesyDrive(throttle, wheel,quickTurn));
     }
 
     // Brake State
