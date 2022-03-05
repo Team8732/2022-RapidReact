@@ -11,6 +11,19 @@ import frc.team8732.lib.geometry.Translation2d;
  * 
  */
 public class Constants {
+    // ROBOT MAP
+    // Drive ID's
+    public static final int kLeftDriveMasterID = 0;
+    public static final int kLeftDriveSlaveAID = 1;
+    public static final int kLeftDriveSlaveBID = 2;
+    public static final int kRightDriveMasterID = 16;
+    public static final int kRightDriveSlaveAID = 15;
+    public static final int kRightDriveSlaveBID = 14;
+
+    // Shooter ID's 
+    public static final int kShooterMasterID = 12;
+    public static final int kShooterSlaveID = 13;
+
     public static final double kLooperDt = 0.01;
 
     // CAN
@@ -21,18 +34,13 @@ public class Constants {
     public static final int kDriveGamepadPort = 0;
     public static final int kButtonGamepadPort = 1;
 
-    // Drive
-    public static final int kLeftDriveMasterId = 5;
-    public static final int kLeftDriveSlaveAId = 6;
-    public static final int kLeftDriveSlaveBId = 7;
-    public static final int kRightDriveMasterId = 12;
-    public static final int kRightDriveSlaveAId = 13;
-    public static final int kRightDriveSlaveBId = 14;
+    // Controller Deadband
+    public static final double kDriveThrottleDeadband = 0.02;
+    public static final double kDriveWheelDeadband = 0.035;
 
     // Drive ratio.
     public static final double kDriveEncoderPPR = 4096.0;
     public static final double kDriveGearReduction = 50.0 / 13.0 * 44.0 / 30.0;
-    public static final double kDriveRotationsPerTick = 1.0 / kDriveEncoderPPR * 1.0 / kDriveGearReduction; // ticks * kDriveRotationsPerTickGear = wheel rotations
     public static final double kGearRatioScalar = (1.0 / (50.0 / 13.0 * 44.0 / 30.0)) / (1.0 / kDriveGearReduction); // TODO Check Scalar
 
     // Wheel parameters.
@@ -79,4 +87,18 @@ public class Constants {
     // Pigeon IMU
     public static final int kPigeonIMUId = 0;
 
+    // Shooter
+    public static final double kShooterKp = 0.0075;
+    public static final double kShooterKi = 0.0;
+    public static final double kShooterKd = 0.0;
+    public static final double kShooterKf = 0.05033127788;
+    public static final double kShooterEncoderPPR = 4096.0;
+    public static final double kShooterOutputToEncoderRatio = 1.0;
+    public static final double kShooterTicksPerRevolution = kShooterOutputToEncoderRatio * kShooterEncoderPPR; // based on gear reduction between encoder and output shaft, and encoder ppr
+    public static final double kShooterAllowableErrorRPM = 150.0; // TODO Tune for 2022 Upper Hub
+
+    // Limelight TODO change values for 2022 bot
+    public static final double kGoalMaxHeightInches = 104.0; // Height from carpet to top of upper hub 
+    public static final double kLimelightAngleHorizontalPlaneToLens = 30.0; // Rotation Angle
+    public static final double kLimelightLensOffGroundHeight = 42.0;        // Measurment from carpet to center or LL lens
 }

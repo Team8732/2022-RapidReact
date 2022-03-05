@@ -18,6 +18,8 @@ import frc.team8732.robot.loops.Looper;
 import frc.team8732.robot.paths.TrajectoryGenerator;
 import frc.team8732.robot.subsystems.Drive;
 import frc.team8732.robot.subsystems.RobotStateEstimator;
+import frc.team8732.robot.subsystems.Shooter;
+import frc.team8732.robot.subsystems.Drive.DriveControlState;
 
 public class Robot extends TimedRobot {
   private final Looper mEnabledLooper = new Looper();
@@ -34,6 +36,7 @@ public class Robot extends TimedRobot {
 
   // Subsystems
   private final Drive mDrive = Drive.getInstance();
+  private final Shooter mShooter = Shooter.getInstance();
 
   // Robot State
   private final RobotState mRobotState = RobotState.getInstance();
@@ -56,7 +59,8 @@ public class Robot extends TimedRobot {
 
         mSubsystemManager.setSubsystems(
           RobotStateEstimator.getInstance(),
-          mDrive
+          mDrive,
+          mShooter
         );
 
         mSubsystemManager.registerEnabledLoops(mEnabledLooper);
@@ -136,6 +140,8 @@ public class Robot extends TimedRobot {
       }
 
       mSubsystemManager.stop();
+
+      mDrive.setControlState(DriveControlState.JOYSTICK);
 
       mEnabledLooper.start();
 

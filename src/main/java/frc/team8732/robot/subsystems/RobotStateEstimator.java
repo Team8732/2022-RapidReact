@@ -9,9 +9,9 @@ import frc.team8732.robot.loops.ILooper;
 import frc.team8732.robot.loops.Loop;
 
 public class RobotStateEstimator extends Subsystem {
-    static RobotStateEstimator mInstance = new RobotStateEstimator();
-    private RobotState mRobotState = RobotState.getInstance();
-    private Drive mDrive = Drive.getInstance();
+    static RobotStateEstimator mInstance;
+    private final RobotState mRobotState = RobotState.getInstance();
+    private final Drive mDrive = Drive.getInstance();
     private double left_encoder_prev_distance_ = 0.0;
     private double right_encoder_prev_distance_ = 0.0;
     private double prev_timestamp_ = -1.0;

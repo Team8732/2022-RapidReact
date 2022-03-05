@@ -4,6 +4,10 @@
 
 package frc.team8732.robot;
 
+import frc.team8732.robot.controller.GameController;
+import frc.team8732.robot.controller.Playstation;
+import frc.team8732.robot.subsystems.Superstructure;
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -12,6 +16,11 @@ package frc.team8732.robot;
  */
 public class RobotContainer {
   private static RobotContainer mInstance;
+
+  private final GameController mDriver = new GameController(Constants.kDriveGamepadPort, new Playstation());
+  private final GameController mOperator = new GameController(Constants.kButtonGamepadPort, new Playstation());
+
+  private final Superstructure mSuperstructure = Superstructure.getInstance();
 
   public synchronized static RobotContainer getInstance() {
     if (mInstance == null) {
@@ -33,4 +42,12 @@ public class RobotContainer {
    * Use this method to define your button-> command mappings.
    */
   private void configureButtonBindings() {}
+
+  public GameController getDriveGameController(){
+    return mDriver;
+  }
+
+  public GameController getOperatorGameController(){
+    return mOperator;
+  }
 }
