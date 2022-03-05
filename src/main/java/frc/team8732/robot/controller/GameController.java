@@ -84,6 +84,10 @@ public class GameController extends Joystick {
 		return getRawButton(map.BUTTON_TOUCHPAD);
 	}
 
+	public boolean getButtonStateMute() {
+		return getRawButton(map.BUTTON_MUTE);
+	}
+
 	public int getDpadAngle() {
 		return this.getPOV();
 	}
@@ -118,6 +122,10 @@ public class GameController extends Joystick {
 
 	public JoystickButton getButtonPad() {
 		return new JoystickButton(this, map.BUTTON_TOUCHPAD);
+	}
+
+	public JoystickButton getButtonMute(){
+		return new JoystickButton(this, map.BUTTON_MUTE);
 	}
 
 	/**

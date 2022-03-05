@@ -30,6 +30,7 @@ public class ButtonMap {
 	public int BUTTON_OPTIONS;
 	public int BUTTON_START;
 	public int BUTTON_TOUCHPAD;
+	public int BUTTON_MUTE;
 	//Sticks
 	public int BUTTON_LEFT_JOYSTICK;
 	public int BUTTON_RIGHT_JOYSTICK;
