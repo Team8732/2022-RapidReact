@@ -9,11 +9,14 @@ import frc.team8732.lib.drivers.TalonSRXFactory;
 import frc.team8732.robot.Constants;
  
 /** Add your docs here. */
- 
 public class Intake extends Subsystem {
-    public static final double percentOutput = 0;
-    private static Intake mInstance;
- 
+  private static Intake mInstance; 
+//Hardware
+private final TalonSRX mSpicyIntake;
+
+    public static final double mFastIntakeSpeed = .8;
+    public static final double mSlowIntakeSpeed = .3; 
+
 //get Instances
 public synchronized static Intake getInstance() {
     if (mInstance == null){
@@ -21,17 +24,15 @@ public synchronized static Intake getInstance() {
     }
       return mInstance;
 }
+
+public void setIntakeSpeedPercent(double percentOutput){
+   mSpicyIntake.set(ControlMode.PercentOutput, percentOutput);
  
-//Hardware(motor controllers/Talons)
-   private final TalonSRX mSpicyIntake;
-   public double setIntakeSpeedPercent(double percentOutput) {
-    return percentOutput;
 }
-   public Intake(){
-    mSpicyIntake = TalonSRXFactory.createDefaultTalon(Constants.kSpicyIntake);
-   }
- 
- 
+public Intake(){
+    mSpicyIntake = TalonSRXFactory.createDefaultTalon(Constants.kIntakeID);
+    }
+
 @Override
 public void stop(){
     mSpicyIntake.set(ControlMode.PercentOutput, 0.0);
@@ -50,4 +51,6 @@ public void outputTelemetry(){
 }
  
 }
+
+
 

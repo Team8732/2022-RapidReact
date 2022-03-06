@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.team8732.robot.subsystems.Intake;
  
 public class setIntakeSpeedPercent extends CommandBase {
- 
   private final Intake mIntake = Intake.getInstance();
  
  
@@ -25,7 +24,7 @@ public class setIntakeSpeedPercent extends CommandBase {
  
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {mIntake.setIntakeSpeedPercent(mIntake.percentOutput);
+  public void initialize() {mIntake.setIntakeSpeedPercent(percentOutput);
   }
  
   // Called every time the scheduler runs while the command is scheduled.
