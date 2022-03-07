@@ -25,13 +25,14 @@ public synchronized static Intake getInstance() {
       return mInstance;
 }
 
-public void setIntakeSpeedPercent(double percentOutput){
-   mSpicyIntake.set(ControlMode.PercentOutput, percentOutput);
- 
-}
 public Intake(){
     mSpicyIntake = TalonSRXFactory.createDefaultTalon(Constants.kIntakeID);
     }
+
+    public void setIntakeSpeedPercent(double percentOutput){
+        mSpicyIntake.set(ControlMode.PercentOutput, percentOutput);
+      
+     }
 
 @Override
 public void stop(){
