@@ -59,7 +59,7 @@ public class RobotState {
     private double distance_driven_;
 
     private RobotState() {
-        reset(0.0, Pose2d.identity(), Pose2d.identity());
+        reset(0.0, Pose2d.identity());
     }
 
     /**
@@ -168,5 +168,6 @@ public class RobotState {
         SmartDashboard.putNumber("Robot Pose Y", odometry.getTranslation().y());
         SmartDashboard.putNumber("Robot Pose Theta", odometry.getRotation().getDegrees());
         SmartDashboard.putNumber("Robot Linear Velocity", vehicle_velocity_measured_.dx);
+        SmartDashboard.putNumber("Distance Driven", getDistanceDriven());
     }
 }
