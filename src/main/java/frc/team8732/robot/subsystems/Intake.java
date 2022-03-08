@@ -13,7 +13,7 @@ import frc.team8732.robot.Constants;
 public class Intake extends Subsystem {
   private static Intake mInstance; 
     //Hardware
-    private final TalonSRX mSpicyIntake;
+    private final TalonSRX mSpicyIntake, mCactusIntake; 
 
         public final double mFastIntakeSpeed = .8;
         public final double mSlowIntakeSpeed = .3; 
@@ -27,17 +27,20 @@ public class Intake extends Subsystem {
     }
 
     public Intake(){
-        mSpicyIntake = TalonSRXFactory.createDefaultTalon(Constants.kIntakeID);
+        mSpicyIntake = TalonSRXFactory.createDefaultTalon(Constants.kIntakeMasterID);
+        mCactusIntake = TalonSRXFactory.createDefaultTalon(Constants.KIntakeSlaveID);
         }
 
     public void setIntakeSpeedPercent(double percentOutput){
         mSpicyIntake.set(ControlMode.PercentOutput, percentOutput);
+        mCactusIntake.set(ControlMode.PercentOutput, percentOutput);
         
         }
 
     @Override
     public void stop(){
         mSpicyIntake.set(ControlMode.PercentOutput, 0.0);
+        mCactusIntake.set(ControlMode.PercentOutput, 0.0);
     }
     
     @Override

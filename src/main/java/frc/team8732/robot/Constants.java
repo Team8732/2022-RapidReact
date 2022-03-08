@@ -21,7 +21,8 @@ public class Constants {
     public static final int kRightDriveSlaveBID = 14;
 
     //Intake
-    public static final int kIntakeID = 9; 
+    public static final int kIntakeMasterID = 9;
+    public static final int KIntakeSlaveID = 11; 
 
     // Shooter ID's 
     public static final int kShooterMasterID = 12;
