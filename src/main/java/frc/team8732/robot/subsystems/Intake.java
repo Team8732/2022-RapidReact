@@ -15,8 +15,8 @@ public class Intake extends Subsystem {
     //Hardware
     private final TalonSRX mSpicyIntake;
 
-        public static final double mFastIntakeSpeed = .8;
-        public static final double mSlowIntakeSpeed = .3; 
+        public final double mFastIntakeSpeed = .8;
+        public final double mSlowIntakeSpeed = .3; 
 
     //get Instances
     public synchronized static Intake getInstance() {
