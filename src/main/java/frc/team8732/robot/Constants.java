@@ -20,9 +20,14 @@ public class Constants {
     public static final int kRightDriveSlaveAID = 14;
     public static final int kRightDriveSlaveBID = 13;
 
+    //Intake
+    public static final int kIntakeMasterID = 6;
+    public static final int KIntakeSlaveID = 11; 
+
     // Shooter ID's 
-    public static final int kShooterMasterID = 4;
-    public static final int kShooterSlaveID = 11;
+    public static final int kShooterMasterID = 5;
+    public static final int kShooterSlaveID = 10;
+    public static final int kShooterIndexkerID = 4;
 
     public static final double kLooperDt = 0.01;
 

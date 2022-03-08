@@ -4,8 +4,10 @@
 
 package frc.team8732.robot;
 
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.team8732.robot.controller.GameController;
 import frc.team8732.robot.controller.Playstation;
+import frc.team8732.robot.subsystems.Intake;
 import frc.team8732.robot.subsystems.Superstructure;
 
 /**
@@ -21,6 +23,7 @@ public class RobotContainer {
   private final GameController mOperator = new GameController(Constants.kButtonGamepadPort, new Playstation());
 
   private final Superstructure mSuperstructure = Superstructure.getInstance();
+  private final Intake mIntake = Intake.getInstance();
 
   public synchronized static RobotContainer getInstance() {
     if (mInstance == null) {
@@ -41,7 +44,10 @@ public class RobotContainer {
   /**
    * Use this method to define your button-> command mappings.
    */
-  private void configureButtonBindings() {}
+  private void configureButtonBindings() {
+    mDriver.getRightBumper().whenPressed( new InstantCommand(()->mIntake.setIntakeSpeedPercent(.5))
+    );
+  }
 
   public GameController getDriveGameController(){
     return mDriver;
