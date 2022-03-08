@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.team8732.robot.controller.GameController;
 import frc.team8732.robot.controller.Playstation;
 import frc.team8732.robot.subsystems.Intake;
+import frc.team8732.robot.subsystems.Shooter;
 import frc.team8732.robot.subsystems.Superstructure;
 
 /**
@@ -24,6 +25,7 @@ public class RobotContainer {
 
   private final Superstructure mSuperstructure = Superstructure.getInstance();
   private final Intake mIntake = Intake.getInstance();
+  private final Shooter mShooter = Shooter.getInstance();
 
   public synchronized static RobotContainer getInstance() {
     if (mInstance == null) {
@@ -45,7 +47,35 @@ public class RobotContainer {
    * Use this method to define your button-> command mappings.
    */
   private void configureButtonBindings() {
-    mDriver.getRightBumper().whenPressed( new InstantCommand(()->mIntake.setIntakeSpeedPercent(.5))
+
+    double groundIntakeSpeed = .75;
+    double topIntakeSpeed = .6;
+
+    double groundOuttakeSpeed = -.75;
+    double topOuttakeSpeed = -.6;
+
+    mDriver.getRightBumper().whenPressed( new InstantCommand(()->mIntake.setIntakeSpeedPercent(groundIntakeSpeed, topIntakeSpeed))
+    );
+
+    mDriver.getRightBumper().whenReleased( new InstantCommand(()->mIntake.stop())
+    );
+
+    mDriver.getLeftBumper().whenPressed( new InstantCommand(()->mIntake.setIntakeSpeedPercent(groundOuttakeSpeed, topOuttakeSpeed))
+    );
+
+    mDriver.getLeftBumper().whenReleased( new InstantCommand(()->mIntake.stop())
+    );
+
+    mDriver.getButtonA().whenPressed( new InstantCommand(()->mShooter.setOpenLoop(.5))
+    );
+
+    mDriver.getButtonA().whenReleased( new InstantCommand(()->mShooter.setOpenLoop(0))
+    );
+
+    mDriver.getButtonA().whenPressed( new InstantCommand(()->mShooter.setIndexerOpenLoop(.5))
+    );
+
+    mDriver.getButtonA().whenReleased( new InstantCommand(()->mShooter.setIndexerOpenLoop(0))
     );
   }
 

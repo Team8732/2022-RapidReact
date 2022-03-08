@@ -34,7 +34,7 @@ public class Shooter extends Subsystem {
     }
 
     // Hardware
-    private final TalonSRX mShooterMaster, mShooterSlave;
+    private final TalonSRX mShooterMaster, mShooterSlave, mShooterIndexer;
 
     // Control States
     private ShooterControlState mShooterControlState = ShooterControlState.OPEN_LOOP;
@@ -49,7 +49,8 @@ public class Shooter extends Subsystem {
 
     public static class PeriodicIO {
         // MOTOR OUTPUT
-        public double demand = 0.0;
+        public double shooter_demand = 0.0;
+        public double indexer_demand = 0.0;
 
         // INPUTS
         public double timestamp;
@@ -64,8 +65,8 @@ public class Shooter extends Subsystem {
     private ReflectingCSVWriter<PeriodicIO> mCSVWriter = null;
 
     private void configureMaster(TalonSRX talon){
-        // General
-        talon.setInverted(InvertType.None);
+        // General 
+        mShooterMaster.setInverted(InvertType.None);
 
         // Encoder 
         TalonUtil.checkError(mShooterMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, kPIDSlot,
@@ -93,7 +94,10 @@ public class Shooter extends Subsystem {
         configureMaster(mShooterMaster);
 
         mShooterSlave = TalonSRXFactory.createPermanentSlaveTalon(Constants.kShooterSlaveID, Constants.kShooterMasterID);
-        mShooterSlave.setInverted(InvertType.FollowMaster);
+        mShooterSlave.setInverted(InvertType.InvertMotorOutput);
+
+        mShooterIndexer = TalonSRXFactory.createDefaultTalon(Constants.kShooterIndexerID);
+        mShooterIndexer.setInverted(InvertType.InvertMotorOutput);
     }
 
     // Subsystem looper methods 
@@ -117,10 +121,11 @@ public class Shooter extends Subsystem {
     @Override
     public void writePeriodicOutputs() {
         if (mShooterControlState == ShooterControlState.OPEN_LOOP) {
-            mShooterMaster.set(ControlMode.PercentOutput, mPeriodicIO.demand);
+            mShooterMaster.set(ControlMode.PercentOutput, mPeriodicIO.shooter_demand);
         } else if (mShooterControlState == ShooterControlState.VELOCITY) {
-            mShooterMaster.set(ControlMode.Velocity, mPeriodicIO.demand);
+            mShooterMaster.set(ControlMode.Velocity, mPeriodicIO.shooter_demand);
         }
+        mShooterIndexer.set(ControlMode.PercentOutput, mPeriodicIO.indexer_demand);
     }
 
     @Override
@@ -166,7 +171,7 @@ public class Shooter extends Subsystem {
     }
 
     public synchronized double getDemandRPM() {
-        return nativeUnitsToRPM(mPeriodicIO.demand);
+        return nativeUnitsToRPM(mPeriodicIO.shooter_demand);
     }
 
     // Shooter modifier methods 
@@ -175,7 +180,7 @@ public class Shooter extends Subsystem {
             mShooterControlState = ShooterControlState.OPEN_LOOP;
         }
 
-        mPeriodicIO.demand = power;
+        mPeriodicIO.shooter_demand = power;
     }
 
     public synchronized void setRPM(double rpm) {
@@ -183,7 +188,11 @@ public class Shooter extends Subsystem {
             mShooterControlState = ShooterControlState.VELOCITY;
         }
 
-        mPeriodicIO.demand = rpmToNativeUnits(rpm);
+        mPeriodicIO.shooter_demand = rpmToNativeUnits(rpm);
+    }
+
+    public synchronized void setIndexerOpenLoop(double power) {
+        mPeriodicIO.indexer_demand = power;
     }
 
     public synchronized boolean isAtSetpoint() {
@@ -194,6 +203,7 @@ public class Shooter extends Subsystem {
     @Override
     public void stop() {
         mShooterMaster.set(ControlMode.PercentOutput, 0.0);
+        mShooterIndexer.set(ControlMode.PercentOutput, 0.0);
     }
 
     @Override
@@ -217,8 +227,8 @@ public class Shooter extends Subsystem {
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Shooter Master RPM", getRPM());
-        SmartDashboard.putNumber("Shooter Demand", mShooterControlState == ShooterControlState.OPEN_LOOP ? mPeriodicIO.demand
-                : (mShooterControlState == ShooterControlState.VELOCITY ? nativeUnitsToRPM(mPeriodicIO.demand) : 0.0));
+        SmartDashboard.putNumber("Shooter Demand", mShooterControlState == ShooterControlState.OPEN_LOOP ? mPeriodicIO.shooter_demand
+                : (mShooterControlState == ShooterControlState.VELOCITY ? nativeUnitsToRPM(mPeriodicIO.shooter_demand) : 0.0));
         SmartDashboard.putBoolean("Shooter At Setpoint", isAtSetpoint());
 
         if (mCSVWriter != null) {

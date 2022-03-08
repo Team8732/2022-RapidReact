@@ -15,16 +15,19 @@ public class setIntakeSpeedPercent extends CommandBase {
  
  
   /** Creates a new setIntakeSpeedPercent. */
-  double percentOutput;
-  public setIntakeSpeedPercent(double percentOutput){
+  double percentOutputGround;
+  double percentOutputTop;
+  public setIntakeSpeedPercent(double percentOutputGround, double percentOutputTop){
  // Use addRequirements() here to declare subsystem dependencies.
- this.percentOutput = percentOutput;
+ this.percentOutputGround = percentOutputGround;
+ this.percentOutputTop = percentOutputTop;
+
   }
  
  
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {mIntake.setIntakeSpeedPercent(percentOutput);}
+  public void initialize() {mIntake.setIntakeSpeedPercent(percentOutputGround, percentOutputTop);}
  
   // Called every time the scheduler runs while the command is scheduled.
   @Override

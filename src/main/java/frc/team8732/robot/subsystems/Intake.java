@@ -31,10 +31,9 @@ public class Intake extends Subsystem {
         mCactusIntake = TalonSRXFactory.createDefaultTalon(Constants.KIntakeSlaveID);
         }
 
-    public void setIntakeSpeedPercent(double percentOutput){
-        mSpicyIntake.set(ControlMode.PercentOutput, percentOutput);
-        mCactusIntake.set(ControlMode.PercentOutput, percentOutput);
-        
+    public void setIntakeSpeedPercent(double percentOutputGround, double percentOutputTop){
+        mSpicyIntake.set(ControlMode.PercentOutput, percentOutputGround);
+        mCactusIntake.set(ControlMode.PercentOutput, percentOutputTop);
         }
 
     @Override

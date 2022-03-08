@@ -27,7 +27,7 @@ public class Constants {
     // Shooter ID's 
     public static final int kShooterMasterID = 5;
     public static final int kShooterSlaveID = 10;
-    public static final int kShooterIndexkerID = 4;
+    public static final int kShooterIndexerID = 4;
 
     public static final double kLooperDt = 0.01;
 
