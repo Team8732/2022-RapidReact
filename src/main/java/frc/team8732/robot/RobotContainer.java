@@ -45,7 +45,7 @@ public class RobotContainer {
    * Use this method to define your button-> command mappings.
    */
   private void configureButtonBindings() {
-    mDriver.getRightBumper().whenPressed( new InstantCommand(()->mIntake.setIntakeSpeedPercent(.8))
+    mDriver.getRightBumper().whenPressed( new InstantCommand(()->mIntake.setIntakeSpeedPercent(.5))
     );
   }
 
