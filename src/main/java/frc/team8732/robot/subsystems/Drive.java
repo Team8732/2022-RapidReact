@@ -26,7 +26,6 @@ import frc.team8732.lib.trajectory.TrajectoryIterator;
 import frc.team8732.lib.trajectory.timing.TimedState;
 import frc.team8732.lib.util.DriveOutput;
 import frc.team8732.lib.util.DriveSignal;
-import frc.team8732.lib.util.OpenLoopCheesyDriveHelper;
 import frc.team8732.lib.util.ReflectingCSVWriter;
 import frc.team8732.robot.Constants;
 import frc.team8732.robot.RobotContainer;
@@ -107,11 +106,12 @@ public class Drive extends Subsystem {
         // General
         TalonUtil.checkError(talon.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10, Constants.kLongCANTimeoutMs), "Could not set talon status frame period");
         talon.setInverted(!left);
+        talon.setSensorPhase(true);
         TalonUtil.checkError(talon.configForwardSoftLimitEnable(false), "Could not set forward soft limit");
         TalonUtil.checkError(talon.configReverseSoftLimitEnable(false), "Could not set reverse soft limit");
 
         // Encoder 
-        final ErrorCode sensorPresent = talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, Constants.kLongCANTimeoutMs); //primary closed-loop, 100 ms timeout
+        final ErrorCode sensorPresent = talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, Constants.kLongCANTimeoutMs); //primary closed-loop, 100 ms timeout
 
         if (sensorPresent != ErrorCode.OK) {
             DriverStation.reportError("Could not detect " + (left ? "left" : "right") + " encoder: " + sensorPresent, false);
@@ -164,8 +164,8 @@ public class Drive extends Subsystem {
                 Constants.kRightDriveMasterID);
         mRightSlaveB.setInverted(true);
 
-        mPigeon = new PigeonIMU(mLeftSlaveB);
-        mLeftSlaveB.setStatusFramePeriod(StatusFrameEnhanced.Status_11_UartGadgeteer, 10, 10);
+        mPigeon = new PigeonIMU(mRightSlaveA);
+        mRightSlaveA.setStatusFramePeriod(StatusFrameEnhanced.Status_11_UartGadgeteer, 10, 10);
 
         setOpenLoop(DriveSignal.NEUTRAL);
 
@@ -257,6 +257,7 @@ public class Drive extends Subsystem {
                             break;
                         case JOYSTICK:
                             driveWithJoystick();
+                            break;
                         default:
                             System.out.println("unexpected drive control state: " + getControlState());
                             break;
@@ -306,31 +307,6 @@ public class Drive extends Subsystem {
     }
 
     // Drive accessor methods
-    public double getLeftEncoderRotations() {
-        return mPeriodicIO.left_position_ticks / Constants.kDriveEncoderPPR;
-    }
-
-    public double getRightEncoderRotations() {
-        return mPeriodicIO.right_position_ticks / Constants.kDriveEncoderPPR;
-    }
-
-    // TODO Check that the rotation + distance calculation is equal between methods
-    public double getLeftWheelRotations() {
-        return getLeftEncoderRotations() / Constants.kDriveGearReduction;
-    }
-
-    public double getRightWheelRotations() {
-        return getRightEncoderRotations() / Constants.kDriveGearReduction;
-    }
-
-    public double getLeftWheelDistanceInches() {
-        return rotationsToInches(getLeftWheelRotations());
-    }
-
-    public double getRightWheelDistanceInches() {
-        return rotationsToInches(getRightWheelRotations());
-    }
-
     public double getLeftEncoderDistance() {
         return mPeriodicIO.left_distance;
     }
@@ -464,28 +440,20 @@ public class Drive extends Subsystem {
         mRightMaster.selectProfileSlot(desired_slot_idx, 0);
     }
 
-    // Joystick Control
-    public synchronized void setOpenLoopJoystick(DriveSignal signal) {
-        if (mDriveControlState != DriveControlState.JOYSTICK) {
-            setBrakeMode(true);
-            System.out.println("switching to open loop joystick");
-            System.out.println(signal);
-            mDriveControlState = DriveControlState.JOYSTICK;
-        }
-
-        mPeriodicIO.left_demand = signal.getLeft();
-        mPeriodicIO.right_demand = signal.getRight();
-        mPeriodicIO.left_feedforward = 0.0;
-        mPeriodicIO.right_feedforward = 0.0;
-    }
-
     public synchronized void driveWithJoystick() {
         GameController driverController = RobotContainer.getInstance().getDriveGameController();
-        double throttle = driverController.getLeftYAxis();
-        double wheel = driverController.getRightXAxis();
-        boolean quickTurn = driverController.getRightBumper().getAsBoolean();
 
-        setOpenLoopJoystick(OpenLoopCheesyDriveHelper.getInstance().cheesyDrive(throttle, wheel,quickTurn));
+        double throttleScalar = .80;
+        double wheelScalar = .60;
+
+        double throttle = (-1 * driverController.getLeftYAxis()) * throttleScalar; 
+        double wheel = (driverController.getRightXAxis() * wheelScalar);
+    
+        mPeriodicIO.left_demand = wheel + throttle ;
+        mPeriodicIO.right_demand = throttle - wheel;
+
+        mLeftMaster.set(ControlMode.PercentOutput, mPeriodicIO.left_demand);
+        mRightMaster.set(ControlMode.PercentOutput, mPeriodicIO.right_demand);
     }
 
     // Brake State
@@ -600,8 +568,6 @@ public class Drive extends Subsystem {
         SmartDashboard.putNumber("Right Drive Ticks", mPeriodicIO.right_position_ticks);
         SmartDashboard.putNumber("Left Drive Ticks", mPeriodicIO.left_position_ticks);
         SmartDashboard.putNumber("Left Drive Distance", mPeriodicIO.left_distance);
-        SmartDashboard.putNumber("Right Drive Distance 8732", getRightWheelDistanceInches());
-        SmartDashboard.putNumber("Left Drive Distance 8732", getLeftWheelDistanceInches());
         SmartDashboard.putNumber("Right Linear Velocity", getRightLinearVelocity());
         SmartDashboard.putNumber("Left Linear Velocity", getLeftLinearVelocity());
 

@@ -16,9 +16,9 @@ public class Constants {
     public static final int kLeftDriveMasterID = 0;
     public static final int kLeftDriveSlaveAID = 1;
     public static final int kLeftDriveSlaveBID = 2;
-    public static final int kRightDriveMasterID = 16;
-    public static final int kRightDriveSlaveAID = 15;
-    public static final int kRightDriveSlaveBID = 14;
+    public static final int kRightDriveMasterID = 15;
+    public static final int kRightDriveSlaveAID = 14;
+    public static final int kRightDriveSlaveBID = 13;
 
     //Intake
     public static final int kIntakeMasterID = 6;
@@ -49,8 +49,8 @@ public class Constants {
     public static final double kGearRatioScalar = (1.0 / (50.0 / 13.0 * 44.0 / 30.0)) / (1.0 / kDriveGearReduction); // TODO Check Scalar
 
     // Wheel parameters.
-    public static final double kDriveWheelTrackWidthInches = 26.0;              
-    public static final double kDriveWheelDiameterInches = 3.9067052758; 
+    public static final double kDriveWheelTrackWidthInches = 22.5625;              
+    public static final double kDriveWheelDiameterInches = 4; //3.90670540497; 
     public static final double kDriveWheelRadiusInches = kDriveWheelDiameterInches / 2.0;
     public static final double kDriveWheelRadiusMeters = Units.inchesToMeters(kDriveWheelDiameterInches);
     public static final double kDriveWheelTrackRadiusWidthMeters = kDriveWheelTrackWidthInches / 2.0 * 0.0254;
@@ -88,9 +88,6 @@ public class Constants {
     public static final double kPathMinLookaheadDistance = 24.0; // inches
 
     public static final Translation2d kVehicleToTurretTranslation = new Translation2d(-6.9, 0);
-
-    // Pigeon IMU
-    public static final int kPigeonIMUId = 0;
 
     // Shooter
     public static final double kShooterKp = 0.0075;

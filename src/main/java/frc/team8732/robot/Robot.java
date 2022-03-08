@@ -101,6 +101,8 @@ public class Robot extends TimedRobot {
 
       mDisabledStartTime = Timer.getFPGATimestamp();
 
+      mDrive.zeroSensors();
+
   } catch (Throwable t) {
       CrashTracker.logThrowableCrash(t);
       throw t;
