@@ -9,7 +9,6 @@ import frc.team8732.robot.controller.GameController;
 import frc.team8732.robot.controller.Playstation;
 import frc.team8732.robot.subsystems.Intake;
 import frc.team8732.robot.subsystems.Shooter;
-import frc.team8732.robot.subsystems.Superstructure;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -23,7 +22,6 @@ public class RobotContainer {
   private final GameController mDriver = new GameController(Constants.kDriveGamepadPort, new Playstation());
   private final GameController mOperator = new GameController(Constants.kButtonGamepadPort, new Playstation());
 
-  private final Superstructure mSuperstructure = Superstructure.getInstance();
   private final Intake mIntake = Intake.getInstance();
   private final Shooter mShooter = Shooter.getInstance();
 
@@ -66,10 +64,10 @@ public class RobotContainer {
     mDriver.getLeftBumper().whenReleased( new InstantCommand(()->mIntake.stop())
     );
 
-    mDriver.getButtonA().whenPressed( new InstantCommand(()->mShooter.setOpenLoop(.5))
+    mDriver.getButtonA().whenPressed( new InstantCommand(()->mShooter.setRPM(2600))
     );
 
-    mDriver.getButtonA().whenReleased( new InstantCommand(()->mShooter.setOpenLoop(0))
+    mDriver.getButtonA().whenReleased( new InstantCommand(()->mShooter.setRPM(0))
     );
 
     mDriver.getButtonA().whenPressed( new InstantCommand(()->mShooter.setIndexerOpenLoop(.5))

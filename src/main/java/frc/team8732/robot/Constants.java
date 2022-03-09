@@ -90,10 +90,10 @@ public class Constants {
     public static final Translation2d kVehicleToTurretTranslation = new Translation2d(-6.9, 0);
 
     // Shooter
-    public static final double kShooterKp = 0.0075;
+    public static final double kShooterKp = 0.0065;
     public static final double kShooterKi = 0.0;
     public static final double kShooterKd = 0.0;
-    public static final double kShooterKf = 0.05033127788;
+    public static final double kShooterKf = 0.03833127788;
     public static final double kShooterEncoderPPR = 4096.0;
     public static final double kShooterOutputToEncoderRatio = 1.0;
     public static final double kShooterTicksPerRevolution = kShooterOutputToEncoderRatio * kShooterEncoderPPR; // based on gear reduction between encoder and output shaft, and encoder ppr

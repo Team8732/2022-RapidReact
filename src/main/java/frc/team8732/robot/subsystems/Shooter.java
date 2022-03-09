@@ -92,6 +92,7 @@ public class Shooter extends Subsystem {
 
         mShooterMaster = TalonSRXFactory.createDefaultTalon(Constants.kShooterMasterID);
         configureMaster(mShooterMaster);
+        mShooterMaster.setSensorPhase(true);
 
         mShooterSlave = TalonSRXFactory.createPermanentSlaveTalon(Constants.kShooterSlaveID, Constants.kShooterMasterID);
         mShooterSlave.setInverted(InvertType.InvertMotorOutput);
@@ -162,12 +163,12 @@ public class Shooter extends Subsystem {
     }
 
     // Shooter accessor methods
-    public synchronized double getRPM() {
-        return nativeUnitsToRPM(getVelocityNativeUnits());
-    }
-
     public synchronized double getVelocityNativeUnits() {
         return mPeriodicIO.velocity_ticks_per_100_ms;
+    }
+
+    public synchronized double getRPM() {
+        return nativeUnitsToRPM(getVelocityNativeUnits());
     }
 
     public synchronized double getDemandRPM() {
