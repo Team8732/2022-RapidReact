@@ -8,6 +8,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team8732.lib.drivers.TalonSRXFactory;
 import frc.team8732.lib.util.ReflectingCSVWriter;
 import frc.team8732.lib.util.Util;
@@ -36,22 +37,21 @@ public class Hood extends Subsystem {
 
   // Control States
     private HoodControlState mHoodControlState = HoodControlState.OPEN_LOOP;
-    private HoodControlMode mHoodControlMode = HoodControlMode.MANUAL;
+    private HoodControlMode mHoodControlMode = HoodControlMode.MOTIONMAGIC;
 
 
   public enum HoodControlState {
     OPEN_LOOP,  // open loop voltage control 
-    MOTIONMAGIC
   }
 
  public enum HoodControlMode { 
-  MANUAL
+   MOTIONMAGIC
 }
 
 // Hardware States
 private final int kMotionMagicSlot = 0;
 
-//"CHECK" SYSTEM (personal)
+// "CHECK" SYSTEM (personal)
 public static class PeriodicIO {
     // MOTOR OUTPUT
     public double demand = 0.0;
@@ -62,20 +62,18 @@ public static class PeriodicIO {
     public double supply_current;
     public double stator_current;
     public double position_ticks = 0.0; 
-    public double position_degrees = Constants.kHoodPositionInDegrees; //TODO Ask Babob from the ground      
+    public double position_degrees = Constants.kHoodPositionInDegrees;     
 }
 
 private PeriodicIO mPeriodicIO;
 private ReflectingCSVWriter<PeriodicIO> mCSVWriter = null;
 
-
-private final double kHoodOutputToEncoderRatio = 392.0/18.0; //ratio: 392:18
+private final double kHoodOutputToEncoderRatio = 392.0/18.0; // Ratio: 392:18
 private final double kHoodRevolutionsToEncoderTicks = kHoodOutputToEncoderRatio * Constants.kHoodEncoderPPR;
-private final double kHoodDegreesToEncoderTicks = kHoodRevolutionsToEncoderTicks / 360.0; //(personal - circle constant)
+private final double kHoodDegreesToEncoderTicks = kHoodRevolutionsToEncoderTicks / 360.0;
 private final double hoodAllowableErrorDegrees = (int) kHoodOutputToEncoderRatio * .1;
 private final double kMINHoodPositionInDegrees = Constants.kHoodPositionInDegrees;
-private final double kMAXHoodPositionInDegrees = 55.00; //TODO (MAX ANGLE)
-
+private final double kMAXHoodPositionInDegrees = 55.00; // TODO (MAX ANGLE)
 
 private double homePositionAngleDegrees = Constants.kHoodPositionInDegrees;  
 
@@ -88,7 +86,7 @@ private double homePositionAngleDegrees = Constants.kHoodPositionInDegrees;
         mPeriodicIO.supply_current = mHoodMotor.getSupplyCurrent();
         mPeriodicIO.stator_current = mHoodMotor.getStatorCurrent();
 
-        mPeriodicIO.position_ticks = mHoodMotor.getSelectedSensorPosition(kMotionMagicSlot); //(personal) raw sensor units is position ticks 
+        mPeriodicIO.position_ticks = mHoodMotor.getSelectedSensorPosition(kMotionMagicSlot); // Raw sensor units is position ticks 
 
         mPeriodicIO.position_degrees = positionTicksToDegrees(mPeriodicIO.position_ticks);
 
@@ -97,13 +95,12 @@ private double homePositionAngleDegrees = Constants.kHoodPositionInDegrees;
         }
     }
 
-   
 private double feedForward = .07;
     @Override
     public void writePeriodicOutputs() {
         if (mHoodControlState == HoodControlState.OPEN_LOOP) {
             mHoodMotor.set(ControlMode.PercentOutput, mPeriodicIO.demand);
-        } else if (mHoodControlState == HoodControlState.MOTIONMAGIC) {
+        } else if (mHoodControlMode == HoodControlMode.MOTIONMAGIC) {
             mHoodMotor.set(ControlMode.MotionMagic, mPeriodicIO.demand, DemandType.ArbitraryFeedForward, feedForward);
         }
     }
@@ -129,17 +126,12 @@ private double feedForward = .07;
 
 // Hood Accesor Methods
 
-  //current position ticks
-  public synchronized double getPositionNativeUnits() { 
-      return mPeriodicIO.position_ticks;
-    }
-
-    //current degrees
+    // Current Degrees
     public synchronized double getDegrees(){  
       return  mPeriodicIO.position_degrees;
     } 
 
-    //desired degree
+    // Desired Degrees
   public synchronized double getDegreesDemand() {  
       return positionTicksToDegrees(mPeriodicIO.demand);
   }
@@ -154,8 +146,8 @@ private double feedForward = .07;
 }
 
 public synchronized void setPositionDegrees(double position_degrees) {
-    if (mHoodControlMode != HoodControlMode.MANUAL) {
-        mHoodControlMode = HoodControlMode.MANUAL;
+    if (mHoodControlMode != HoodControlMode.MOTIONMAGIC) {
+        mHoodControlMode = HoodControlMode.MOTIONMAGIC;
         }
 
     if (position_degrees > kMAXHoodPositionInDegrees) {
@@ -185,10 +177,15 @@ public synchronized boolean isAtSetpoint() {
   }
 
 
-  @Override
+ @Override
   public void outputTelemetry() {
-    
-  }
+    SmartDashboard.putNumber("Hood Master Degrees", getDegrees());
+        SmartDashboard.putNumber("Hood Demand", mHoodControlState == HoodControlState.OPEN_LOOP ? mPeriodicIO.demand
+                : (mHoodControlMode == HoodControlMode.MOTIONMAGIC ? degreesToPositionTicks(mPeriodicIO.demand) : 0.0));
+        SmartDashboard.putBoolean("Hood At Setpoint", isAtSetpoint());
 
-
+        if (mCSVWriter != null) {
+            mCSVWriter.write();
+        }
+   }
 }
