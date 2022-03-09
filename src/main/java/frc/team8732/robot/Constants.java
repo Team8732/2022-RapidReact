@@ -24,6 +24,15 @@ public class Constants {
     public static final int kShooterMasterID = 12;
     public static final int kShooterSlaveID = 13;
 
+    // Hood Subsystem ID's
+    public static final int kHoodMotor = 3; //TODO
+    public static final double kHoodEncoderPPR = 4096.0;
+    public static final double kHoodOutputToEncoderRatio = 392.00/18.00;
+    public static final double kHoodPositionInDegrees = 15.69; //TODO (angle at its lowest)
+    public static final double kMINHoodPositionInDegrees = kHoodPositionInDegrees;
+    public static final double kMAXHoodPositionInDegrees = 55.00; //TODO (MAX ANGLE)
+
+    
     public static final double kLooperDt = 0.01;
 
     // CAN
@@ -101,4 +110,6 @@ public class Constants {
     public static final double kGoalMaxHeightInches = 104.0; // Height from carpet to top of upper hub 
     public static final double kLimelightAngleHorizontalPlaneToLens = 30.0; // Rotation Angle
     public static final double kLimelightLensOffGroundHeight = 42.0;        // Measurment from carpet to center or LL lens
+
+    
 }
