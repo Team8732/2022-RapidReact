@@ -109,6 +109,8 @@ public class Drive extends Subsystem {
         talon.setSensorPhase(true);
         TalonUtil.checkError(talon.configForwardSoftLimitEnable(false), "Could not set forward soft limit");
         TalonUtil.checkError(talon.configReverseSoftLimitEnable(false), "Could not set reverse soft limit");
+        talon.configNeutralDeadband(0.02, 0);
+
 
         // Encoder 
         final ErrorCode sensorPresent = talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, Constants.kLongCANTimeoutMs); //primary closed-loop, 100 ms timeout
@@ -443,8 +445,8 @@ public class Drive extends Subsystem {
     public synchronized void driveWithJoystick() {
         GameController driverController = RobotContainer.getInstance().getDriveGameController();
 
-        double throttleScalar = .80;
-        double wheelScalar = .60;
+        double throttleScalar = .50;
+        double wheelScalar = .20;
 
         double throttle = (-1 * driverController.getLeftYAxis()) * throttleScalar; 
         double wheel = (driverController.getRightXAxis() * wheelScalar);
