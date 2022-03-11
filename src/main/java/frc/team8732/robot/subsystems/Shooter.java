@@ -97,7 +97,7 @@ public class Shooter extends Subsystem {
         mShooterSlave = TalonSRXFactory.createPermanentSlaveTalon(Constants.kShooterSlaveID, Constants.kShooterMasterID);
         mShooterSlave.setInverted(InvertType.InvertMotorOutput);
 
-        mShooterIndexer = TalonSRXFactory.createDefaultTalon(Constants.kShooterIndexerID);
+        mShooterIndexer = new TalonSRX(Constants.kShooterIndexerID);
         mShooterIndexer.setInverted(InvertType.InvertMotorOutput);
     }
 
