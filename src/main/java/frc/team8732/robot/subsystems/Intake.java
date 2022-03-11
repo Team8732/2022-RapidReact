@@ -5,7 +5,8 @@
 package frc.team8732.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import frc.team8732.lib.drivers.TalonSRXFactory;
+
+import frc.team8732.lib.drivers.TalonUtil;
 import frc.team8732.robot.Constants;
  
 /** This is the Intake subsystem for the 2022 robot. It contains all the information 
@@ -13,10 +14,7 @@ import frc.team8732.robot.Constants;
 public class Intake extends Subsystem {
   private static Intake mInstance; 
     //Hardware
-    private final TalonSRX mSpicyIntake, mCactusIntake; 
-
-        public final double mFastIntakeSpeed = .8;
-        public final double mSlowIntakeSpeed = .3; 
+    private final TalonSRX mIntakeGround, mIntakeExtension; 
 
     //get Instances
     public synchronized static Intake getInstance() {
@@ -27,19 +25,26 @@ public class Intake extends Subsystem {
     }
 
     public Intake(){
-        mSpicyIntake = TalonSRXFactory.createDefaultTalon(Constants.kIntakeMasterID);
-        mCactusIntake = TalonSRXFactory.createDefaultTalon(Constants.KIntakeSlaveID);
+        mIntakeGround = new TalonSRX(Constants.kIntakeGroundID);
+
+        TalonUtil.checkError(mIntakeGround.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs), "Could not config spicy intake voltage comp saturation");
+        mIntakeGround.enableVoltageCompensation(true);
+
+        mIntakeExtension = new TalonSRX(Constants.kIntakeExtensionID);
+
+        TalonUtil.checkError(mIntakeExtension.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs), "Could not config cactus intake voltage comp saturation");
+        mIntakeExtension.enableVoltageCompensation(true);
         }
 
     public void setIntakeSpeedPercent(double percentOutputGround, double percentOutputTop){
-        mSpicyIntake.set(ControlMode.PercentOutput, percentOutputGround);
-        mCactusIntake.set(ControlMode.PercentOutput, percentOutputTop);
+        mIntakeGround.set(ControlMode.PercentOutput, percentOutputGround);
+        mIntakeExtension.set(ControlMode.PercentOutput, percentOutputTop);
         }
 
     @Override
     public void stop(){
-        mSpicyIntake.set(ControlMode.PercentOutput, 0.0);
-        mCactusIntake.set(ControlMode.PercentOutput, 0.0);
+        mIntakeGround.set(ControlMode.PercentOutput, 0.0);
+        mIntakeExtension.set(ControlMode.PercentOutput, 0.0);
     }
     
     @Override
