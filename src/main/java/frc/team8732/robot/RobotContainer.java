@@ -4,11 +4,8 @@
 
 package frc.team8732.robot;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.team8732.robot.controller.GameController;
 import frc.team8732.robot.controller.Playstation;
-import frc.team8732.robot.subsystems.Intake;
-import frc.team8732.robot.subsystems.Shooter;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -21,9 +18,6 @@ public class RobotContainer {
 
   private final GameController mDriver = new GameController(Constants.kDriveGamepadPort, new Playstation());
   private final GameController mOperator = new GameController(Constants.kButtonGamepadPort, new Playstation());
-
-  private final Intake mIntake = Intake.getInstance();
-  private final Shooter mShooter = Shooter.getInstance();
 
   public synchronized static RobotContainer getInstance() {
     if (mInstance == null) {
@@ -44,38 +38,7 @@ public class RobotContainer {
   /**
    * Use this method to define your button-> command mappings.
    */
-  private void configureButtonBindings() {
-
-    double groundIntakeSpeed = .75;
-    double topIntakeSpeed = .6;
-
-    double groundOuttakeSpeed = -.75;
-    double topOuttakeSpeed = -.6;
-
-    mDriver.getRightBumper().whenPressed( new InstantCommand(()->mIntake.setIntakeSpeedPercent(groundIntakeSpeed, topIntakeSpeed))
-    );
-
-    mDriver.getRightBumper().whenReleased( new InstantCommand(()->mIntake.stop())
-    );
-
-    mDriver.getLeftBumper().whenPressed( new InstantCommand(()->mIntake.setIntakeSpeedPercent(groundOuttakeSpeed, topOuttakeSpeed))
-    );
-
-    mDriver.getLeftBumper().whenReleased( new InstantCommand(()->mIntake.stop())
-    );
-
-    mDriver.getButtonA().whenPressed( new InstantCommand(()->mShooter.setRPM(2600))
-    );
-
-    mDriver.getButtonA().whenReleased( new InstantCommand(()->mShooter.setRPM(0))
-    );
-
-    mDriver.getButtonA().whenPressed( new InstantCommand(()->mShooter.setIndexerOpenLoop(.5))
-    );
-
-    mDriver.getButtonA().whenReleased( new InstantCommand(()->mShooter.setIndexerOpenLoop(0))
-    );
-  }
+  private void configureButtonBindings() {}
 
   public GameController getDriveGameController(){
     return mDriver;
