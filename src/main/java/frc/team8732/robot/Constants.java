@@ -20,14 +20,17 @@ public class Constants {
     public static final int kRightDriveSlaveAID = 14;
     public static final int kRightDriveSlaveBID = 13;
 
-    //Intake
-    public static final int kIntakeMasterID = 6;
-    public static final int KIntakeSlaveID = 11; 
+    // Intake
+    public static final int kIntakeGroundID = 5;
+    public static final int kIntakeExtensionID = 10; 
 
     // Shooter ID's 
-    public static final int kShooterMasterID = 5;
-    public static final int kShooterSlaveID = 10;
+    public static final int kShooterMasterID = 3;
+    public static final int kShooterSlaveID = 12;
     public static final int kShooterIndexerID = 4;
+
+    // Hood
+    public static final int kHoodMotorID = 11;
 
     public static final double kLooperDt = 0.01;
 
@@ -98,6 +101,22 @@ public class Constants {
     public static final double kShooterOutputToEncoderRatio = 1.0;
     public static final double kShooterTicksPerRevolution = kShooterOutputToEncoderRatio * kShooterEncoderPPR; // based on gear reduction between encoder and output shaft, and encoder ppr
     public static final double kShooterAllowableErrorRPM = 150.0; // TODO Tune for 2022 Upper Hub
+
+    // Hood
+    public static final double kHoodHomePositionDegress = 55;
+    public static final double kHoodMaxPositionDegress = 55;
+    public static final double kHoodMinPositionDegress = 0;
+    public static final double kHoodKp = 0.5;
+    public static final double kHoodKi = 0.008;
+    public static final double kHoodKd = 0.02;
+    public static final double kHoodKf = 0.045;
+    public static final double kHoodEncoderPPR = 4096.0;
+    public static final double kHoodMotionCruiseVelocity = 6000;
+    public static final double kHoodMotionAcceleration = 12000;
+    public static final double kHoodOutputToEncoderRatio = 392.0/18.0;
+    public static final double kHoodTicksPerRevolution = kHoodOutputToEncoderRatio * kHoodEncoderPPR; // based on gear reduction between encoder and output shaft, and encoder ppr
+    public static final double kHoodTicksPerDegree = kHoodTicksPerRevolution / 360.0;
+    public static final double kHoodPositionDeadband = 2; // TODO Tune for 2022 Upper Hub
 
     // Limelight TODO change values for 2022 bot
     public static final double kGoalMaxHeightInches = 104.0; // Height from carpet to top of upper hub 
