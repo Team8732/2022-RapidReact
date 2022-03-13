@@ -34,7 +34,7 @@ public class Shooter extends Subsystem {
     }
 
     // Hardware
-    private final TalonSRX mShooterMaster, mShooterSlave, mShooterIndexer;
+    private final TalonSRX mShooterMaster, mShooterSlave;
 
     // Control States
     private ShooterControlState mShooterControlState = ShooterControlState.OPEN_LOOP;
@@ -50,7 +50,6 @@ public class Shooter extends Subsystem {
     public static class PeriodicIO {
         // MOTOR OUTPUT
         public double shooter_demand = 0.0;
-        public double indexer_demand = 0.0;
 
         // INPUTS
         public double timestamp;
@@ -96,9 +95,6 @@ public class Shooter extends Subsystem {
 
         mShooterSlave = TalonSRXFactory.createPermanentSlaveTalon(Constants.kShooterSlaveID, Constants.kShooterMasterID);
         mShooterSlave.setInverted(InvertType.InvertMotorOutput);
-
-        mShooterIndexer = new TalonSRX(Constants.kShooterIndexerID);
-        mShooterIndexer.setInverted(InvertType.InvertMotorOutput);
     }
 
     // Subsystem looper methods 
@@ -113,7 +109,6 @@ public class Shooter extends Subsystem {
         mPeriodicIO.velocity_ticks_per_100_ms = mShooterMaster.getSelectedSensorVelocity(0);
 
         mPeriodicIO.velocity_rpm = nativeUnitsToRPM(mPeriodicIO.velocity_ticks_per_100_ms);
-
         if (mCSVWriter != null) {
             mCSVWriter.add(mPeriodicIO);
         }
@@ -126,7 +121,6 @@ public class Shooter extends Subsystem {
         } else if (mShooterControlState == ShooterControlState.VELOCITY) {
             mShooterMaster.set(ControlMode.Velocity, mPeriodicIO.shooter_demand);
         }
-        mShooterIndexer.set(ControlMode.PercentOutput, mPeriodicIO.indexer_demand);
     }
 
     @Override
@@ -192,10 +186,6 @@ public class Shooter extends Subsystem {
         mPeriodicIO.shooter_demand = rpmToNativeUnits(rpm);
     }
 
-    public synchronized void setIndexerOpenLoop(double power) {
-        mPeriodicIO.indexer_demand = power;
-    }
-
     public synchronized boolean isAtSetpoint() {
         return Util.epsilonEquals(getRPM(), getDemandRPM(),
                 Constants.kShooterAllowableErrorRPM);
@@ -204,7 +194,6 @@ public class Shooter extends Subsystem {
     @Override
     public void stop() {
         mShooterMaster.set(ControlMode.PercentOutput, 0.0);
-        mShooterIndexer.set(ControlMode.PercentOutput, 0.0);
     }
 
     @Override

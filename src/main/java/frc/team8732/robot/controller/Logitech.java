@@ -13,18 +13,16 @@ public Logitech() {
     this.AXIS_RIGHT_X= 2;
     this.AXIS_RIGHT_Y= 3;
     
-    this.BUTTON_X = 1;
-    this.BUTTON_A = 2;
-    this.BUTTON_B = 3;
+    this.BUTTON_X = 3;
+    this.BUTTON_A = 1;
+    this.BUTTON_B = 2;
     this.BUTTON_Y = 4;
     this.BUTTON_LEFT_BUMPER = 5;	
     this.BUTTON_RIGHT_BUMPER = 6;
-    this.BUTTON_LEFT_TRIGGER = 7;
-    this.BUTTON_RIGHT_TRIGGER = 8;
-    this.BUTTON_SHARE = 9;          //Back Button        
-    this.BUTTON_OPTIONS = 10;       //Start Button    
-    this.BUTTON_LEFT_JOYSTICK = 11;
-    this.BUTTON_RIGHT_JOYSTICK = 12;
+    this.BUTTON_SHARE = 7;          //Back Button        
+    this.BUTTON_OPTIONS = 8;       //Start Button    
+    this.BUTTON_LEFT_JOYSTICK = 9;
+    this.BUTTON_RIGHT_JOYSTICK = 10;
        
     }
 }

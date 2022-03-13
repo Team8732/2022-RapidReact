@@ -23,6 +23,8 @@ public class Constants {
     // Intake
     public static final int kIntakeGroundID = 5;
     public static final int kIntakeExtensionID = 10; 
+    public static final int kTowerTopBeamBreakID = 0; 
+    public static final int kTowerBottomBeamBreakID = 2; 
 
     // Shooter ID's 
     public static final int kShooterMasterID = 3;
@@ -77,7 +79,7 @@ public class Constants {
     public static final double kDriveLinearKv = 0.0438 / 2.0 * Constants.kDriveWheelDiameterInches; // V / rad/s
     public static final double kMiniCIMStallTorque = 1.41; // N*m
     public static final double kAssumedTorqueEfficiency = 0.70;
-    public static final double kRobotLinearInertia = 62.051; // kg TODO
+    public static final double kRobotLinearInertia = 50; // kg TODO
     public static final double kDriveAnalyticalLinearKa = 12.0 /* V */ / ((kDriveGearReduction * kMiniCIMStallTorque * kAssumedTorqueEfficiency * 6) / (kRobotLinearInertia * kDriveWheelRadiusMeters * kDriveWheelRadiusMeters));
     public static final double kDriveLinearKa = 0.00597 / 2.0 * Constants.kDriveWheelDiameterInches * kGearRatioScalar; // V / rad/s^2
     public static final double kDriveAngularKa = 0.00517 / 2.0 * Constants.kDriveWheelDiameterInches * kGearRatioScalar; // V per rad/s^2
@@ -101,6 +103,12 @@ public class Constants {
     public static final double kShooterOutputToEncoderRatio = 1.0;
     public static final double kShooterTicksPerRevolution = kShooterOutputToEncoderRatio * kShooterEncoderPPR; // based on gear reduction between encoder and output shaft, and encoder ppr
     public static final double kShooterAllowableErrorRPM = 150.0; // TODO Tune for 2022 Upper Hub
+        
+        // Speeds
+        public static final double kShooterIdleRPM = 1500;
+        public static final double kShooterFenderRPM = 1900;
+        public static final double kShooterProtectedRPM = 2200;
+        public static final double kShooterTerminalRPM = 2600; 
 
     // Hood
     public static final double kHoodHomePositionDegress = 55;
@@ -117,6 +125,12 @@ public class Constants {
     public static final double kHoodTicksPerRevolution = kHoodOutputToEncoderRatio * kHoodEncoderPPR; // based on gear reduction between encoder and output shaft, and encoder ppr
     public static final double kHoodTicksPerDegree = kHoodTicksPerRevolution / 360.0;
     public static final double kHoodPositionDeadband = 2; // TODO Tune for 2022 Upper Hub
+
+        // Degrees
+        public static final double kHoodIdleDegree = 30;
+        public static final double kHoodFenderDegree = 18;
+        public static final double kHoodProtectedDegree = 30;
+        public static final double kHoodTerminalDegree = 42;
 
     // Limelight TODO change values for 2022 bot
     public static final double kGoalMaxHeightInches = 104.0; // Height from carpet to top of upper hub 

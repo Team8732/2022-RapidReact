@@ -203,12 +203,6 @@ public class Hood extends Subsystem {
         mPeriodicIO.demand = degreeToNativeUnits(filteredDegree);
     }
 
-    public synchronized boolean hasFinishedTrajectory() {
-        return mHoodControlState == HoodControlState.MOTION_MAGIC && 
-        Util.epsilonEquals(mHoodMaster.getActiveTrajectoryPosition(), getDemandDegree(),
-                Constants.kHoodPositionDeadband);
-    }
-
     public synchronized boolean isAtSetpoint() {
         return Util.epsilonEquals(getDegree(), getDemandDegree(),
                 Constants.kHoodPositionDeadband);

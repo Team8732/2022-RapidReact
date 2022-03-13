@@ -59,6 +59,7 @@ public class Drive extends Subsystem {
         OPEN_LOOP, // open loop voltage control,
         VELOCITY, // velocity control
         PATH_FOLLOWING,
+        LIMELIGHT,
         JOYSTICK
     }
 
@@ -109,8 +110,6 @@ public class Drive extends Subsystem {
         talon.setSensorPhase(true);
         TalonUtil.checkError(talon.configForwardSoftLimitEnable(false), "Could not set forward soft limit");
         TalonUtil.checkError(talon.configReverseSoftLimitEnable(false), "Could not set reverse soft limit");
-        talon.configNeutralDeadband(0.02, 0);
-
 
         // Encoder 
         final ErrorCode sensorPresent = talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, Constants.kLongCANTimeoutMs); //primary closed-loop, 100 ms timeout
@@ -259,6 +258,9 @@ public class Drive extends Subsystem {
                             break;
                         case JOYSTICK:
                             driveWithJoystick();
+                            break;
+                        case LIMELIGHT:
+                            // trackGoal();
                             break;
                         default:
                             System.out.println("unexpected drive control state: " + getControlState());
@@ -445,8 +447,8 @@ public class Drive extends Subsystem {
     public synchronized void driveWithJoystick() {
         GameController driverController = RobotContainer.getInstance().getDriveGameController();
 
-        double throttleScalar = .50;
-        double wheelScalar = .20;
+        double throttleScalar = .45;
+        double wheelScalar = .30;
 
         double throttle = (-1 * driverController.getLeftYAxis()) * throttleScalar; 
         double wheel = (driverController.getRightXAxis() * wheelScalar);
@@ -573,13 +575,6 @@ public class Drive extends Subsystem {
         SmartDashboard.putNumber("Right Linear Velocity", getRightLinearVelocity());
         SmartDashboard.putNumber("Left Linear Velocity", getLeftLinearVelocity());
 
-        SmartDashboard.putNumber("Left Drive 1 Current", mLeftMaster.getStatorCurrent());
-        SmartDashboard.putNumber("Left Drive 2 Current", mLeftSlaveA.getStatorCurrent());
-        SmartDashboard.putNumber("Left Drive 3 Current", mLeftSlaveB.getStatorCurrent());
-        SmartDashboard.putNumber("Right Drive 1 Current", mRightMaster.getStatorCurrent());
-        SmartDashboard.putNumber("Right Drive 2 Current", mRightSlaveA.getStatorCurrent());
-        SmartDashboard.putNumber("Right Drive 3 Current", mRightSlaveB.getStatorCurrent());
-
         SmartDashboard.putNumber("Left Drive Demand", mPeriodicIO.left_demand);
         SmartDashboard.putNumber("Right Drive Demand", mPeriodicIO.right_demand);
         SmartDashboard.putNumber("Left Drive Feedforward", mPeriodicIO.left_feedforward);
@@ -599,6 +594,3 @@ public class Drive extends Subsystem {
     }
 
 }
-
-   
-
