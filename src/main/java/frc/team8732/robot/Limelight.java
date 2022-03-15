@@ -7,11 +7,13 @@ package frc.team8732.robot;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team8732.lib.geometry.Translation2d;
 import frc.team8732.lib.util.Util;
+import frc.team8732.robot.subsystems.Subsystem;
 
 /** This is the Limelight 2+ vision templete (Thanks Team 2910) */
-public class Limelight {
+public class Limelight extends Subsystem {
     private static Limelight mInstance;
 
     public synchronized static Limelight getInstance() {
@@ -293,5 +295,29 @@ public class Limelight {
          * The primary camera stream is placed in the lower-right corner of the secondary camera stream
          */
         PIP_SECONDARY
+    }
+
+    @Override
+    public void stop() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public boolean checkSystem() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public void outputTelemetry() {
+        SmartDashboard.putBoolean("Has Target", hasTarget());
+        SmartDashboard.putNumber("X Offset", getTargetHorizOffset());
+        SmartDashboard.putNumber("Y Offset", getTargetVertOffset());
+        SmartDashboard.putNumber("Get Target X", getTargetPosition().x());
+        SmartDashboard.putNumber("Get Target Y", getTargetPosition().y());
+        SmartDashboard.putNumber("Get Predicted Distance", getLimelightDistanceFromTarget());
+        SmartDashboard.putNumber("LED Mode", ledMode.getDouble(0));
+
     }
 }

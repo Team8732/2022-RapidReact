@@ -17,11 +17,11 @@ import frc.team8732.robot.auto.modes.AutoModeBase;
 import frc.team8732.robot.loops.Looper;
 import frc.team8732.robot.paths.TrajectoryGenerator;
 import frc.team8732.robot.subsystems.Drive;
+import frc.team8732.robot.subsystems.Drive.DriveControlState;
 import frc.team8732.robot.subsystems.Hood;
 import frc.team8732.robot.subsystems.Intake;
 import frc.team8732.robot.subsystems.RobotStateEstimator;
 import frc.team8732.robot.subsystems.Shooter;
-import frc.team8732.robot.subsystems.Drive.DriveControlState;
 
 public class Robot extends TimedRobot {
   private final Looper mEnabledLooper = new Looper();
@@ -41,6 +41,7 @@ public class Robot extends TimedRobot {
   private final Shooter mShooter = Shooter.getInstance();
   private final Intake mIntake = Intake.getInstance();
   private final Hood mHood = Hood.getInstance();
+  private final Limelight mLimelight = Limelight.getInstance();
 
   // Robot State
   private final RobotState mRobotState = RobotState.getInstance();
@@ -66,7 +67,8 @@ public class Robot extends TimedRobot {
           mDrive,
           mShooter,
           mIntake,
-          mHood
+          mHood,
+          mLimelight
         );
 
         mSubsystemManager.registerEnabledLoops(mEnabledLooper);
@@ -106,8 +108,6 @@ public class Robot extends TimedRobot {
       mDisabledLooper.start();
 
       mDisabledStartTime = Timer.getFPGATimestamp();
-
-      mDrive.zeroSensors();
 
   } catch (Throwable t) {
       CrashTracker.logThrowableCrash(t);

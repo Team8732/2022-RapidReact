@@ -41,7 +41,7 @@ public class Intake extends Subsystem {
         // Intaking
         private double kGroundIntakeSpeed = .75;
         private double kIndexkerIntakeSpeed = .5;
-        private double kKickerIntakeSpeed = .45;
+        private double kKickerIntakeSpeed = .3;
 
         // Outtaking
         private double kGroundOuttakeSpeed = -.75;
@@ -199,5 +199,6 @@ public class Intake extends Subsystem {
     public void outputTelemetry(){
         SmartDashboard.putBoolean("Top Beam Break", mTopIndexerBeamBreak.get());
         SmartDashboard.putBoolean("Bottom Beam Break", mBottomIndexerBeamBreak.get());
+        SmartDashboard.putString("Intake State", mIntakeSystemState.toString());
     }
 }

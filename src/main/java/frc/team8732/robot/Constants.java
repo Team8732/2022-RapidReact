@@ -76,12 +76,12 @@ public class Constants {
 
     // robot dynamics TODO tune
     public static final double kDriveVIntercept = 0.352; // V TODO
-    public static final double kDriveLinearKv = 0.0438 / 2.0 * Constants.kDriveWheelDiameterInches; // V / rad/s
+    public static final double kDriveLinearKv = 0.11862064541505624 / 2.0 * Constants.kDriveWheelDiameterInches; // V / rad/s
     public static final double kMiniCIMStallTorque = 1.41; // N*m
     public static final double kAssumedTorqueEfficiency = 0.70;
     public static final double kRobotLinearInertia = 50; // kg TODO
     public static final double kDriveAnalyticalLinearKa = 12.0 /* V */ / ((kDriveGearReduction * kMiniCIMStallTorque * kAssumedTorqueEfficiency * 6) / (kRobotLinearInertia * kDriveWheelRadiusMeters * kDriveWheelRadiusMeters));
-    public static final double kDriveLinearKa = 0.00597 / 2.0 * Constants.kDriveWheelDiameterInches * kGearRatioScalar; // V / rad/s^2
+    public static final double kDriveLinearKa = 0.015470549986407171 / 2.0 * Constants.kDriveWheelDiameterInches * kGearRatioScalar; // V / rad/s^2
     public static final double kDriveAngularKa = 0.00517 / 2.0 * Constants.kDriveWheelDiameterInches * kGearRatioScalar; // V per rad/s^2
     public static final double kRobotAngularInertia = kDriveAngularKa / kDriveLinearKa *
             kDriveWheelTrackRadiusWidthMeters * kDriveWheelTrackRadiusWidthMeters * kRobotLinearInertia;  // kg m^2
@@ -107,7 +107,7 @@ public class Constants {
         // Speeds
         public static final double kShooterIdleRPM = 1500;
         public static final double kShooterFenderRPM = 1900;
-        public static final double kShooterProtectedRPM = 2200;
+        public static final double kShooterProtectedRPM = 2400;
         public static final double kShooterTerminalRPM = 2600; 
 
     // Hood
@@ -129,11 +129,11 @@ public class Constants {
         // Degrees
         public static final double kHoodIdleDegree = 30;
         public static final double kHoodFenderDegree = 18;
-        public static final double kHoodProtectedDegree = 30;
+        public static final double kHoodProtectedDegree = 34;
         public static final double kHoodTerminalDegree = 42;
 
     // Limelight TODO change values for 2022 bot
-    public static final double kGoalMaxHeightInches = 104.0; // Height from carpet to top of upper hub 
-    public static final double kLimelightAngleHorizontalPlaneToLens = 30.0; // Rotation Angle
-    public static final double kLimelightLensOffGroundHeight = 42.0;        // Measurment from carpet to center or LL lens
+    public static final double kGoalMaxHeightInches = 104.5; // Height from carpet to top of upper hub 
+    public static final double kLimelightAngleHorizontalPlaneToLens = 30; // Rotation Angle
+    public static final double kLimelightLensOffGroundHeight = 44;        // Measurment from carpet to center or LL lens
 }
