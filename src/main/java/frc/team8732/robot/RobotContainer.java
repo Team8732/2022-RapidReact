@@ -4,6 +4,7 @@
 
 package frc.team8732.robot;
 
+import frc.team8732.robot.commands.SystemSetCalculatedShot;
 import frc.team8732.robot.commands.SystemSetDefinedShot;
 import frc.team8732.robot.commands.setDriveControlState;
 import frc.team8732.robot.commands.setIntakeSystemState;
@@ -63,6 +64,9 @@ public class RobotContainer {
     mOperator.getButtonB().whenPressed(new SystemSetDefinedShot(Constants.kShooterProtectedRPM, Constants.kHoodProtectedDegree)); // Protected Shot
 
     mOperator.getButtonY().whenPressed(new SystemSetDefinedShot(Constants.kShooterTerminalRPM, Constants.kHoodTerminalDegree)); // Terminal Shot
+
+    mDriver.getButtonY().whenPressed(new SystemSetCalculatedShot()); // Calculated Shot
+
   }
 
   public GameController getDriveGameController(){

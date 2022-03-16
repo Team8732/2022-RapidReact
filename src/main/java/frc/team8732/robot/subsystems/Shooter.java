@@ -14,9 +14,11 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team8732.lib.drivers.TalonSRXFactory;
 import frc.team8732.lib.drivers.TalonUtil;
+import frc.team8732.lib.util.InterpolatingDouble;
 import frc.team8732.lib.util.ReflectingCSVWriter;
 import frc.team8732.lib.util.Util;
 import frc.team8732.robot.Constants;
+import frc.team8732.robot.Limelight;
 import frc.team8732.robot.loops.ILooper;
 import frc.team8732.robot.loops.Loop;
 
@@ -58,6 +60,7 @@ public class Shooter extends Subsystem {
         public double stator_current;
         public double velocity_ticks_per_100_ms = 0.0; // Talon SRX + 775 Pro
         public double velocity_rpm = 0.0;              // Talon SRX + 775 Pro
+        public double calculated_rpm = 0.0;
     }
 
     private PeriodicIO mPeriodicIO;
@@ -109,6 +112,7 @@ public class Shooter extends Subsystem {
         mPeriodicIO.velocity_ticks_per_100_ms = mShooterMaster.getSelectedSensorVelocity(0);
 
         mPeriodicIO.velocity_rpm = nativeUnitsToRPM(mPeriodicIO.velocity_ticks_per_100_ms);
+        mPeriodicIO.calculated_rpm = calculatedDesiredRPM();
         if (mCSVWriter != null) {
             mCSVWriter.add(mPeriodicIO);
         }
@@ -156,6 +160,12 @@ public class Shooter extends Subsystem {
         return rpm / 60.0 / 10.0 * Constants.kShooterTicksPerRevolution;
     }
 
+    public synchronized double calculatedDesiredRPM() {
+        Limelight mLimelight = Limelight.getInstance();
+        InterpolatingDouble interpolatedRPM =  Constants.kLobRPMMap.getInterpolated(new InterpolatingDouble(mLimelight.getLimelightDistanceFromTarget()));
+        return interpolatedRPM.value;
+    }
+
     // Shooter accessor methods
     public synchronized double getVelocityNativeUnits() {
         return mPeriodicIO.velocity_ticks_per_100_ms;
@@ -167,6 +177,10 @@ public class Shooter extends Subsystem {
 
     public synchronized double getDemandRPM() {
         return nativeUnitsToRPM(mPeriodicIO.shooter_demand);
+    }
+
+    public synchronized double getCalculatedRPM() {
+        return mPeriodicIO.calculated_rpm;
     }
 
     // Shooter modifier methods 
@@ -220,6 +234,7 @@ public class Shooter extends Subsystem {
         SmartDashboard.putNumber("Shooter Demand", mShooterControlState == ShooterControlState.OPEN_LOOP ? mPeriodicIO.shooter_demand
                 : (mShooterControlState == ShooterControlState.VELOCITY ? nativeUnitsToRPM(mPeriodicIO.shooter_demand) : 0.0));
         SmartDashboard.putBoolean("Shooter At Setpoint", isAtSetpoint());
+        SmartDashboard.putNumber("Calcuated RPM", getCalculatedRPM());
 
         if (mCSVWriter != null) {
             mCSVWriter.write();

@@ -261,6 +261,7 @@ public class Drive extends Subsystem {
                             break;
                         case LIMELIGHT:
                             // trackGoal();
+                            driveWithJoystick();
                             break;
                         default:
                             System.out.println("unexpected drive control state: " + getControlState());

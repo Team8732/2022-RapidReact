@@ -2,6 +2,8 @@ package frc.team8732.robot;
 
 import edu.wpi.first.math.util.Units;
 import frc.team8732.lib.geometry.Translation2d;
+import frc.team8732.lib.util.InterpolatingDouble;
+import frc.team8732.lib.util.InterpolatingTreeMap;
 
 /**
  * A list of constants used by the rest of the robot code. This includes physics
@@ -133,7 +135,30 @@ public class Constants {
         public static final double kHoodTerminalDegree = 42;
 
     // Limelight TODO change values for 2022 bot
-    public static final double kGoalMaxHeightInches = 104.5; // Height from carpet to top of upper hub 
-    public static final double kLimelightAngleHorizontalPlaneToLens = 30; // Rotation Angle
-    public static final double kLimelightLensOffGroundHeight = 44;        // Measurment from carpet to center or LL lens
+    public static final double kGoalMaxHeightInches = 104; // Height from carpet to top of upper hub 
+    public static final double kLimelightAngleHorizontalPlaneToLens = 28; // Rotation Angle
+    public static final double kLimelightLensOffGroundHeight = 44.16;        // Measurment from carpet to center or LL lens
+
+    // Interpolation Mao
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kLobHoodMap = new InterpolatingTreeMap<>();
+    static {
+        kLobHoodMap.put(new InterpolatingDouble(48.0), new InterpolatingDouble(11.0));
+        kLobHoodMap.put(new InterpolatingDouble(84.0), new InterpolatingDouble(22.0));
+        kLobHoodMap.put(new InterpolatingDouble(114.0), new InterpolatingDouble(29.0));
+        kLobHoodMap.put(new InterpolatingDouble(135.0), new InterpolatingDouble(32.0));
+        kLobHoodMap.put(new InterpolatingDouble(184.0), new InterpolatingDouble(39.0));
+        kLobHoodMap.put(new InterpolatingDouble(226.0), new InterpolatingDouble(42.0));
+        kLobHoodMap.put(new InterpolatingDouble(276.0), new InterpolatingDouble(45.0));
+    }
+
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kLobRPMMap = new InterpolatingTreeMap<>();
+    static {
+        kLobRPMMap.put(new InterpolatingDouble(48.0), new InterpolatingDouble(1900.0));
+        kLobRPMMap.put(new InterpolatingDouble(84.0), new InterpolatingDouble(1900.0));
+        kLobRPMMap.put(new InterpolatingDouble(114.0), new InterpolatingDouble(2100.0));
+        kLobRPMMap.put(new InterpolatingDouble(135.0), new InterpolatingDouble(2125.0));
+        kLobRPMMap.put(new InterpolatingDouble(184.0), new InterpolatingDouble(2350.0));
+        kLobRPMMap.put(new InterpolatingDouble(226.0), new InterpolatingDouble(2600.0));
+        kLobRPMMap.put(new InterpolatingDouble(276.0), new InterpolatingDouble(2900.0));
+    }
 }

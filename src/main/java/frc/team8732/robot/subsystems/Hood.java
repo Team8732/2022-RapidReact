@@ -15,9 +15,11 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team8732.lib.drivers.TalonSRXFactory;
 import frc.team8732.lib.drivers.TalonUtil;
+import frc.team8732.lib.util.InterpolatingDouble;
 import frc.team8732.lib.util.ReflectingCSVWriter;
 import frc.team8732.lib.util.Util;
 import frc.team8732.robot.Constants;
+import frc.team8732.robot.Limelight;
 import frc.team8732.robot.loops.ILooper;
 import frc.team8732.robot.loops.Loop;
 
@@ -59,6 +61,7 @@ public class Hood extends Subsystem {
         public double stator_current;
         public double position_ticks = 0.0;     // Talon SRX + 775 Pro
         public double position_degrees = 0.0;   // Talon SRX + 775 Pro
+        public double calculated_degree = 0.0;
     }
 
     private PeriodicIO mPeriodicIO;
@@ -112,6 +115,7 @@ public class Hood extends Subsystem {
         mPeriodicIO.position_ticks = mHoodMaster.getSelectedSensorPosition(0);
 
         mPeriodicIO.position_degrees = nativeUnitsToDegree(mPeriodicIO.position_ticks);
+        mPeriodicIO.calculated_degree = calculatedDesiredDegree();
 
         if (mCSVWriter != null) {
             mCSVWriter.add(mPeriodicIO);
@@ -162,6 +166,13 @@ public class Hood extends Subsystem {
         * Constants.kHoodTicksPerDegree;
     }
 
+    
+    public synchronized double calculatedDesiredDegree() {
+        Limelight mLimelight = Limelight.getInstance();
+        InterpolatingDouble interpolatedDegree =  Constants.kLobHoodMap.getInterpolated(new InterpolatingDouble(mLimelight.getLimelightDistanceFromTarget()));
+        return interpolatedDegree.value;
+    }
+
     // Hood accessor methods
     public synchronized double getPositionNativeUnits() {
         return mPeriodicIO.position_ticks;
@@ -173,6 +184,10 @@ public class Hood extends Subsystem {
 
     public synchronized double getDemandDegree() {
         return nativeUnitsToDegree(mPeriodicIO.demand);
+    }
+
+    public synchronized double getCalculatedDegree() {
+        return mPeriodicIO.calculated_degree;
     }
 
     // Hood modifier methods 
@@ -237,6 +252,7 @@ public class Hood extends Subsystem {
         SmartDashboard.putNumber("Hood Demand", mHoodControlState == HoodControlState.OPEN_LOOP ? mPeriodicIO.demand
                 : (mHoodControlState == HoodControlState.MOTION_MAGIC ? nativeUnitsToDegree(mPeriodicIO.demand) : 0.0));
         SmartDashboard.putBoolean("Hood At Setpoint", isAtSetpoint());
+        SmartDashboard.putNumber("Calculated Degree", getCalculatedDegree());
 
         if (mCSVWriter != null) {
             mCSVWriter.write();
