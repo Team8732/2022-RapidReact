@@ -2,6 +2,8 @@ package frc.team8732.robot.subsystems;
 
 import java.util.ArrayList;
 
+import javax.swing.plaf.synth.SynthButtonUI;
+
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
@@ -28,8 +30,10 @@ import frc.team8732.lib.util.DriveOutput;
 import frc.team8732.lib.util.DriveSignal;
 import frc.team8732.lib.util.ReflectingCSVWriter;
 import frc.team8732.robot.Constants;
+import frc.team8732.robot.Limelight;
 import frc.team8732.robot.RobotContainer;
 import frc.team8732.robot.RobotState;
+import frc.team8732.robot.Limelight.LedMode;
 import frc.team8732.robot.controller.GameController;
 import frc.team8732.robot.loops.ILooper;
 import frc.team8732.robot.loops.Loop;
@@ -260,8 +264,7 @@ public class Drive extends Subsystem {
                             driveWithJoystick();
                             break;
                         case LIMELIGHT:
-                            // trackGoal();
-                            driveWithJoystick();
+                            trackGoal();
                             break;
                         default:
                             System.out.println("unexpected drive control state: " + getControlState());
@@ -460,6 +463,52 @@ public class Drive extends Subsystem {
         mLeftMaster.set(ControlMode.PercentOutput, mPeriodicIO.left_demand);
         mRightMaster.set(ControlMode.PercentOutput, mPeriodicIO.right_demand);
     }
+
+        //Track Goal   
+    public synchronized void trackGoal() {
+        Limelight limelight = Limelight.getInstance();
+        GameController driverController = RobotContainer.getInstance().getDriveGameController();
+
+        double throttleScalar = .45;
+        double wheelScalar = .30;
+
+        double throttle = (-1 * driverController.getLeftYAxis()) * throttleScalar; 
+        double wheel = (driverController.getRightXAxis() * wheelScalar);
+
+        limelight.setPipeline(0);
+        limelight.setLedMode(LedMode.ON);
+        
+        double cameraSteer = 0;
+        double rotationDemand;
+        double kCameraDriveClose = .08;
+        double kCameraClose = 10;
+        double kCameraMid = 15;
+        double kCameraFar = 20; 
+        double kCameraDriveMid = .043;
+        double kCameraDriveFar = .033;
+
+        if (limelight.hasTarget()) {
+            double kCameraDrive = kCameraDriveClose;
+            if (limelight.getTargetHorizOffset() <= kCameraClose) {
+                kCameraDrive = kCameraDriveClose;
+            } else if (limelight.getTargetHorizOffset() < kCameraMid) {
+                kCameraDrive = kCameraDriveMid;
+            } else if (limelight.getTargetHorizOffset() < kCameraFar) {
+                kCameraDrive = kCameraDriveFar;
+            }
+            cameraSteer = limelight.getTargetHorizOffset() * kCameraDrive;
+        } else {
+            cameraSteer = wheel;
+        }
+        rotationDemand = -cameraSteer;
+
+        mPeriodicIO.left_demand = rotationDemand + throttle ;
+        mPeriodicIO.right_demand = throttle - rotationDemand;
+
+        mLeftMaster.set(ControlMode.PercentOutput, mPeriodicIO.left_demand);
+        mRightMaster.set(ControlMode.PercentOutput, mPeriodicIO.right_demand);
+    }
+    
 
     // Brake State
     public boolean isBrakeMode() {
