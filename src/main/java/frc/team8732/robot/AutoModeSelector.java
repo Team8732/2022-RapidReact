@@ -15,7 +15,7 @@ public class AutoModeSelector {
     }
 
     enum DesiredMode {
-        DO_NOTHING, TEST_TRAJECTORY, THREE_BALL,
+        DO_NOTHING, TEST_TRAJECTORY, THREE_BALL,FIVE_BALL
     }
 
     private DesiredMode mCachedDesiredMode = null;
@@ -36,6 +36,8 @@ public class AutoModeSelector {
         mModeChooser = new SendableChooser<>();
         mModeChooser.setDefaultOption("Do Nothing", DesiredMode.DO_NOTHING);
         mModeChooser.addOption("Test Trajectory", DesiredMode.TEST_TRAJECTORY);
+        mModeChooser.addOption("Five Ball Trajectory", DesiredMode.FIVE_BALL);
+
         
         SmartDashboard.putData("Auto mode", mModeChooser);
     }
@@ -76,7 +78,9 @@ public class AutoModeSelector {
                     return Optional.of(new DoNothingAutoMode()); // Starting terminal side three ball auto
                 }else{
                     return Optional.of(new DoNothingAutoMode()); // Starting hanger side three ball auto
-                }
+                } 
+            case FIVE_BALL:
+                    return Optional.of(new FiveBallAutoMode());
             default:
                 break;
         }

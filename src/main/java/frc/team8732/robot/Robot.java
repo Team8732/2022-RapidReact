@@ -77,8 +77,8 @@ public class Robot extends TimedRobot {
         mTrajectoryGenerator.generateTrajectories();
 
         // Robot starts backwards, turret starts backwards (in robot frame)
-        mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.fromRotation(Rotation2d.fromDegrees(180)));
-        mDrive.setHeading(Rotation2d.fromDegrees(180)); // TODO Check Heading
+        mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.fromRotation(Rotation2d.fromDegrees(135)));
+        mDrive.zeroSensors(); // TODO Check Heading
 
         mAutoModeSelector.updateModeCreator();
 
@@ -124,8 +124,8 @@ public class Robot extends TimedRobot {
       mDisabledLooper.stop();
     
       // Robot starts backwards, turret starts backwards (in robot frame)
-      mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.fromRotation(Rotation2d.fromDegrees(180)));
-      mDrive.setHeading(Rotation2d.fromDegrees(180)); //TODO Check Heading
+      mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.fromRotation(Rotation2d.fromDegrees(135)));
+      mDrive.zeroSensors(); 
 
       mEnabledLooper.start();
       mAutoModeExecutor.start();
