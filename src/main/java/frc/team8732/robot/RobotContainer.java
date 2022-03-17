@@ -59,13 +59,16 @@ public class RobotContainer {
     mOperator.getLeftBumper().whenPressed(new setIntakeSystemState(IntakeSystemState.OUTTAKING));
     mOperator.getLeftBumper().whenReleased(new setIntakeSystemState(IntakeSystemState.IDLE));
 
+    mOperator.getRightTrigger().whenPressed(new setIntakeSystemState(IntakeSystemState.RELEASE));
+    mOperator.getRightTrigger().whenReleased(new setIntakeSystemState(IntakeSystemState.IDLE));
+
     mOperator.getButtonA().whenPressed(new SystemSetDefinedShot(Constants.kShooterFenderRPM, Constants.kHoodFenderDegree)); // Fender Shot
 
     mOperator.getButtonB().whenPressed(new SystemSetDefinedShot(Constants.kShooterProtectedRPM, Constants.kHoodProtectedDegree)); // Protected Shot
 
     mOperator.getButtonY().whenPressed(new SystemSetDefinedShot(Constants.kShooterTerminalRPM, Constants.kHoodTerminalDegree)); // Terminal Shot
 
-    mDriver.getButtonY().whenPressed(new SystemSetCalculatedShot()); // Calculated Shot
+    mOperator.getButtonX().whenPressed(new SystemSetCalculatedShot()); // Calculated Shot
 
   }
 

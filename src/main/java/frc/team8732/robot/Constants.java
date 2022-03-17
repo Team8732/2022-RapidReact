@@ -136,8 +136,8 @@ public class Constants {
 
     // Limelight TODO change values for 2022 bot
     public static final double kGoalMaxHeightInches = 104; // Height from carpet to top of upper hub 
-    public static final double kLimelightAngleHorizontalPlaneToLens = 28; // Rotation Angle
-    public static final double kLimelightLensOffGroundHeight = 44.16;        // Measurment from carpet to center or LL lens
+    public static final double kLimelightAngleHorizontalPlaneToLens = 30; // Rotation Angle
+    public static final double kLimelightLensOffGroundHeight = 44.25;        // Measurment from carpet to center or LL lens
 
     // Interpolation Mao
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kLobHoodMap = new InterpolatingTreeMap<>();

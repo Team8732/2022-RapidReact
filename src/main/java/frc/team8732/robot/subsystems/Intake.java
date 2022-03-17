@@ -55,6 +55,7 @@ public class Intake extends Subsystem {
 
     public enum IntakeSystemState {
         IDLE, 
+        RELEASE,
         INTAKING,
         OUTTAKING,
         SHOOTING
@@ -132,6 +133,11 @@ public class Intake extends Subsystem {
                     case IDLE:
                         mPeriodicIO.ground_demand = 0;
                         mPeriodicIO.indexer_demand = 0;
+                        mPeriodicIO.kicker_demand = 0;
+                        break;
+                    case RELEASE:
+                        mPeriodicIO.ground_demand = 0;
+                        mPeriodicIO.indexer_demand = 1;
                         mPeriodicIO.kicker_demand = 0;
                         break;
                     case INTAKING:
