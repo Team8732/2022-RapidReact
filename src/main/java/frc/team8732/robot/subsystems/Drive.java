@@ -2,8 +2,6 @@ package frc.team8732.robot.subsystems;
 
 import java.util.ArrayList;
 
-import javax.swing.plaf.synth.SynthButtonUI;
-
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
@@ -31,9 +29,9 @@ import frc.team8732.lib.util.DriveSignal;
 import frc.team8732.lib.util.ReflectingCSVWriter;
 import frc.team8732.robot.Constants;
 import frc.team8732.robot.Limelight;
+import frc.team8732.robot.Limelight.LedMode;
 import frc.team8732.robot.RobotContainer;
 import frc.team8732.robot.RobotState;
-import frc.team8732.robot.Limelight.LedMode;
 import frc.team8732.robot.controller.GameController;
 import frc.team8732.robot.loops.ILooper;
 import frc.team8732.robot.loops.Loop;
