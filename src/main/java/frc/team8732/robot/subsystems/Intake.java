@@ -41,7 +41,7 @@ public class Intake extends Subsystem {
         // Intaking
         private double kGroundIntakeSpeed = .75;
         private double kIndexkerIntakeSpeed = .5;
-        private double kKickerIntakeSpeed = .3;
+        private double kKickerIntakeSpeed = .325;
 
         // Outtaking
         private double kGroundOuttakeSpeed = -.75;
@@ -50,7 +50,7 @@ public class Intake extends Subsystem {
 
         // Shooting
         private double kGroundShootingSpeed = 0;
-        private double kIndexerShootingSpeed = .5;
+        private double kIndexerShootingSpeed = .4;
         private double kKickerShootingSpeed = .6;
 
     public enum IntakeSystemState {

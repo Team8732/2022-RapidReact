@@ -9,13 +9,12 @@ import java.util.Optional;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.team8732.lib.geometry.Pose2d;
-import frc.team8732.lib.geometry.Rotation2d;
 import frc.team8732.lib.util.CrashTracker;
 import frc.team8732.robot.auto.AutoModeExecutor;
 import frc.team8732.robot.auto.modes.AutoModeBase;
 import frc.team8732.robot.loops.Looper;
 import frc.team8732.robot.paths.TrajectoryGenerator;
+import frc.team8732.robot.subsystems.Climb;
 import frc.team8732.robot.subsystems.Drive;
 import frc.team8732.robot.subsystems.Drive.DriveControlState;
 import frc.team8732.robot.subsystems.Hood;
@@ -42,6 +41,8 @@ public class Robot extends TimedRobot {
   private final Intake mIntake = Intake.getInstance();
   private final Hood mHood = Hood.getInstance();
   private final Limelight mLimelight = Limelight.getInstance();
+  private final Climb mClimb = Climb.getInstance();
+
 
   // Robot State
   private final RobotState mRobotState = RobotState.getInstance();
@@ -68,7 +69,8 @@ public class Robot extends TimedRobot {
           mShooter,
           mIntake,
           mHood,
-          mLimelight
+          mLimelight,
+          mClimb
         );
 
         mSubsystemManager.registerEnabledLoops(mEnabledLooper);
@@ -77,7 +79,7 @@ public class Robot extends TimedRobot {
         mTrajectoryGenerator.generateTrajectories();
 
         // Robot starts backwards, turret starts backwards (in robot frame)
-        mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.fromRotation(Rotation2d.fromDegrees(135)));
+        // mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.fromRotation(mAutoModeSelector.getAutoRotation()));
         mDrive.zeroSensors(); // TODO Check Heading
 
         mAutoModeSelector.updateModeCreator();
@@ -124,7 +126,7 @@ public class Robot extends TimedRobot {
       mDisabledLooper.stop();
     
       // Robot starts backwards, turret starts backwards (in robot frame)
-      mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.fromRotation(Rotation2d.fromDegrees(135)));
+      // mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.fromRotation(mAutoModeSelector.getAutoRotation()));
       mDrive.zeroSensors(); 
 
       mEnabledLooper.start();

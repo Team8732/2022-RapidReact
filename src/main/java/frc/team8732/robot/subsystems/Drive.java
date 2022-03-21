@@ -62,7 +62,8 @@ public class Drive extends Subsystem {
         VELOCITY, // velocity control
         PATH_FOLLOWING,
         LIMELIGHT,
-        JOYSTICK
+        JOYSTICK,
+        AUTO
     }
 
     // Hardware states
@@ -168,7 +169,9 @@ public class Drive extends Subsystem {
         mRightSlaveB.setInverted(true);
 
         mPigeon = new PigeonIMU(mRightSlaveA);
+        mPigeon.configFactoryDefault();
         mRightSlaveA.setStatusFramePeriod(StatusFrameEnhanced.Status_11_UartGadgeteer, 10, 10);
+        
 
         setOpenLoop(DriveSignal.NEUTRAL);
 
@@ -263,6 +266,9 @@ public class Drive extends Subsystem {
                             break;
                         case LIMELIGHT:
                             trackGoal();
+                            break;
+                        case AUTO:
+                            trackGoalAuto();
                             break;
                         default:
                             System.out.println("unexpected drive control state: " + getControlState());
@@ -379,6 +385,19 @@ public class Drive extends Subsystem {
         mPeriodicIO.right_feedforward = 0.0;
     }
 
+    public synchronized void setPercentOpenLoop(double percent) {
+        if (mDriveControlState != DriveControlState.OPEN_LOOP) {
+            setBrakeMode(true);
+            System.out.println("switching to open loop");
+            mDriveControlState = DriveControlState.OPEN_LOOP;
+        }
+
+        mPeriodicIO.left_demand = percent;
+        mPeriodicIO.right_demand = percent;
+        mPeriodicIO.left_feedforward = 0.0;
+        mPeriodicIO.right_feedforward = 0.0;
+    }
+
     // Path Following
     /**
      * Configure talons for following via the ramsete controller
@@ -419,8 +438,10 @@ public class Drive extends Subsystem {
         if (mDriveControlState == DriveControlState.PATH_FOLLOWING) {
             final double now = Timer.getFPGATimestamp();
 
-            DriveOutput output = mMotionPlanner.update(now, RobotState.getInstance().getFieldToVehicle(now));
 
+			DriveOutput output = mMotionPlanner.update(now,
+					RobotState.getInstance().getFieldToVehicle());
+                    
             mPeriodicIO.error = mMotionPlanner.error();
             mPeriodicIO.path_setpoint = mMotionPlanner.setpoint();
 
@@ -449,8 +470,8 @@ public class Drive extends Subsystem {
     public synchronized void driveWithJoystick() {
         GameController driverController = RobotContainer.getInstance().getDriveGameController();
 
-        double throttleScalar = .45;
-        double wheelScalar = .30;
+        double throttleScalar = .55;
+        double wheelScalar = .40;
 
         double throttle = (-1 * driverController.getLeftYAxis()) * throttleScalar; 
         double wheel = (driverController.getRightXAxis() * wheelScalar);
@@ -478,12 +499,12 @@ public class Drive extends Subsystem {
         
         double cameraSteer = 0;
         double rotationDemand;
-        double kCameraDriveClose = .08;
         double kCameraClose = 10;
         double kCameraMid = 15;
         double kCameraFar = 20; 
-        double kCameraDriveMid = .043;
-        double kCameraDriveFar = .033;
+        double kCameraDriveClose = .05;
+        double kCameraDriveMid = .033;
+        double kCameraDriveFar = .023;
 
         if (limelight.hasTarget()) {
             double kCameraDrive = kCameraDriveClose;
@@ -498,10 +519,47 @@ public class Drive extends Subsystem {
         } else {
             cameraSteer = wheel;
         }
-        rotationDemand = -cameraSteer;
+        rotationDemand = cameraSteer;
 
         mPeriodicIO.left_demand = rotationDemand + throttle ;
         mPeriodicIO.right_demand = throttle - rotationDemand;
+
+        mLeftMaster.set(ControlMode.PercentOutput, mPeriodicIO.left_demand);
+        mRightMaster.set(ControlMode.PercentOutput, mPeriodicIO.right_demand);
+    }
+
+    public synchronized void trackGoalAuto() {
+        Limelight limelight = Limelight.getInstance();
+
+        limelight.setPipeline(0);
+        limelight.setLedMode(LedMode.ON);
+        
+        double cameraSteer = 0;
+        double rotationDemand;
+        double kCameraClose = 10;
+        double kCameraMid = 15;
+        double kCameraFar = 20; 
+        double kCameraDriveClose = .05;
+        double kCameraDriveMid = .033;
+        double kCameraDriveFar = .023;
+
+        if (limelight.hasTarget()) {
+            double kCameraDrive = kCameraDriveClose;
+            if (limelight.getTargetHorizOffset() <= kCameraClose) {
+                kCameraDrive = kCameraDriveClose;
+            } else if (limelight.getTargetHorizOffset() < kCameraMid) {
+                kCameraDrive = kCameraDriveMid;
+            } else if (limelight.getTargetHorizOffset() < kCameraFar) {
+                kCameraDrive = kCameraDriveFar;
+            }
+            cameraSteer = limelight.getTargetHorizOffset() * kCameraDrive;
+        } else {
+
+        }
+        rotationDemand = cameraSteer;
+
+        mPeriodicIO.left_demand = rotationDemand;
+        mPeriodicIO.right_demand = -rotationDemand;
 
         mLeftMaster.set(ControlMode.PercentOutput, mPeriodicIO.left_demand);
         mRightMaster.set(ControlMode.PercentOutput, mPeriodicIO.right_demand);

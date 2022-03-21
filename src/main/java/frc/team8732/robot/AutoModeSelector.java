@@ -2,8 +2,8 @@ package frc.team8732.robot;
 
 import java.util.Optional;
 
+import frc.team8732.lib.geometry.Rotation2d;
 import frc.team8732.robot.auto.modes.*;
-
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -15,7 +15,7 @@ public class AutoModeSelector {
     }
 
     enum DesiredMode {
-        DO_NOTHING, TEST_TRAJECTORY, THREE_BALL,FIVE_BALL
+        DO_NOTHING, TEST_TRAJECTORY, THREE_BALL,FOUR_BALL,FIVE_BALL,STEAL_BALL,SHOOT_ONE
     }
 
     private DesiredMode mCachedDesiredMode = null;
@@ -25,6 +25,8 @@ public class AutoModeSelector {
     private SendableChooser<StartingPosition> mStartPositionChooser;
 
     private Optional<AutoModeBase> mAutoMode = Optional.empty();
+
+    private Rotation2d autoRotation = Rotation2d.fromDegrees(147);
 
     public AutoModeSelector() {
         mStartPositionChooser = new SendableChooser<>();
@@ -36,7 +38,10 @@ public class AutoModeSelector {
         mModeChooser = new SendableChooser<>();
         mModeChooser.setDefaultOption("Do Nothing", DesiredMode.DO_NOTHING);
         mModeChooser.addOption("Test Trajectory", DesiredMode.TEST_TRAJECTORY);
+        mModeChooser.addOption("Four Ball Auto", DesiredMode.FOUR_BALL);
         mModeChooser.addOption("Five Ball Trajectory", DesiredMode.FIVE_BALL);
+        mModeChooser.addOption("Steal Ball Trajectory", DesiredMode.STEAL_BALL);
+        mModeChooser.addOption("Shoot One", DesiredMode.SHOOT_ONE);
 
         
         SmartDashboard.putData("Auto mode", mModeChooser);
@@ -79,8 +84,17 @@ public class AutoModeSelector {
                 }else{
                     return Optional.of(new DoNothingAutoMode()); // Starting hanger side three ball auto
                 } 
+            case FOUR_BALL:
+                autoRotation = Rotation2d.fromDegrees(135);
+                return Optional.of(new FourBallAutoMode());
             case FIVE_BALL:
-                    return Optional.of(new FiveBallAutoMode());
+                autoRotation = Rotation2d.fromDegrees(-147);
+                 return Optional.of(new FiveBallAutoMode());
+            case STEAL_BALL:
+                autoRotation = Rotation2d.fromDegrees(135);
+                return Optional.of(new TwoBallSteal());
+            case SHOOT_ONE:
+            return Optional.of(new ShootDoNothing());
             default:
                 break;
         }
@@ -94,9 +108,14 @@ public class AutoModeSelector {
         mCachedDesiredMode = null;
     }
 
+    public Rotation2d getAutoRotation(){
+        return autoRotation;
+    }
+
     public void outputToSmartDashboard() {
         SmartDashboard.putString("AutoModeSelected", mCachedDesiredMode.name());
         SmartDashboard.putString("StartingPositionSelected", mCachedStartingPosition.name());
+        SmartDashboard.putString("Auto Starting Rot", getAutoRotation().toString());
     }
 
     public Optional<AutoModeBase> getAutoMode() {

@@ -6,12 +6,16 @@ package frc.team8732.robot;
 
 import frc.team8732.robot.commands.SystemSetCalculatedShot;
 import frc.team8732.robot.commands.SystemSetDefinedShot;
+import frc.team8732.robot.commands.setClimbSystemState;
 import frc.team8732.robot.commands.setDriveControlState;
 import frc.team8732.robot.commands.setIntakeSystemState;
+import frc.team8732.robot.commands.setOffsetRPM;
 import frc.team8732.robot.controller.GameController;
 import frc.team8732.robot.controller.Playstation;
 import frc.team8732.robot.subsystems.Drive.DriveControlState;
 import frc.team8732.robot.subsystems.Intake.IntakeSystemState;
+import frc.team8732.robot.subsystems.Shooter;
+import frc.team8732.robot.subsystems.Climb.ClimbSystemState;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -24,6 +28,8 @@ public class RobotContainer {
 
   private final GameController mDriver = new GameController(Constants.kDriveGamepadPort, new Playstation());
   private final GameController mOperator = new GameController(Constants.kButtonGamepadPort, new Playstation());
+
+  Shooter mShooter = Shooter.getInstance();
 
   public synchronized static RobotContainer getInstance() {
     if (mInstance == null) {
@@ -70,6 +76,14 @@ public class RobotContainer {
 
     mOperator.getButtonX().whenPressed(new SystemSetCalculatedShot()); // Calculated Shot
 
+    mOperator.getDPadUp().whenPressed(new setClimbSystemState(ClimbSystemState.UP));
+    mOperator.getDPadUp().whenReleased(new setClimbSystemState(ClimbSystemState.IDLE));
+
+    mOperator.getDPadDown().whenPressed(new setClimbSystemState(ClimbSystemState.DOWN));
+    mOperator.getDPadDown().whenReleased(new setClimbSystemState(ClimbSystemState.IDLE));
+
+    mOperator.getDPadRight().whenPressed(new setOffsetRPM(20));
+    mOperator.getDPadLeft().whenPressed(new setOffsetRPM(-20));
   }
 
   public GameController getDriveGameController(){

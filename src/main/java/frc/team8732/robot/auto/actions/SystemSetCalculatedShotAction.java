@@ -2,9 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.team8732.robot.commands;
+package frc.team8732.robot.auto.actions;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.team8732.robot.Constants;
 import frc.team8732.robot.Limelight;
 import frc.team8732.robot.subsystems.Drive;
@@ -12,7 +11,7 @@ import frc.team8732.robot.subsystems.Drive.DriveControlState;
 import frc.team8732.robot.subsystems.Hood;
 import frc.team8732.robot.subsystems.Shooter;
 
-public class SystemSetCalculatedShot extends CommandBase {
+public class SystemSetCalculatedShotAction implements Action {
   /** Creates a new SystemSetCalculatedShot. */
   Shooter mShooter = Shooter.getInstance();
   Hood mHood = Hood.getInstance();
@@ -25,21 +24,21 @@ public class SystemSetCalculatedShot extends CommandBase {
   double degree;
   double lastValidDegree = -1;
 
-  public SystemSetCalculatedShot() {}
+  public SystemSetCalculatedShotAction() {}
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    mDrive.setControlState(DriveControlState.LIMELIGHT);
+  public void start() {
+    mDrive.setControlState(DriveControlState.AUTO);
     mShooter.setRPM(Constants.kShooterIdleRPM);
     mHood.setDegree(Constants.kHoodIdleDegree);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
+  public void update() {
     if(mLimelight.hasTarget()){
-      rpm = mShooter.getCalculatedRPM() + mShooter.getOffsetRPM();
+      rpm = mShooter.getCalculatedRPM();
       mShooter.setRPM(rpm);
       lastValidRPM = rpm;
 
@@ -54,7 +53,7 @@ public class SystemSetCalculatedShot extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
+  public void done() {
     mShooter.setRPM(Constants.kShooterIdleRPM);
     mHood.setDegree(Constants.kHoodIdleDegree);
   }
@@ -62,6 +61,6 @@ public class SystemSetCalculatedShot extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return mDrive.getControlState() == DriveControlState.JOYSTICK;
+    return mDrive.getControlState() == DriveControlState.PATH_FOLLOWING;
   }
 }

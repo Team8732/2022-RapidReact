@@ -33,6 +33,9 @@ public class Constants {
     public static final int kShooterSlaveID = 12;
     public static final int kShooterIndexerID = 4;
 
+    // Climb 
+    public static final int kClimbMotorID = 8;
+
     // Hood
     public static final int kHoodMotorID = 11;
 
@@ -81,7 +84,7 @@ public class Constants {
     public static final double kDriveLinearKv = 0.11862064541505624 / 2.0 * Constants.kDriveWheelDiameterInches; // V / rad/s
     public static final double kMiniCIMStallTorque = 1.41; // N*m
     public static final double kAssumedTorqueEfficiency = 0.70;
-    public static final double kRobotLinearInertia = 50; // kg TODO
+    public static final double kRobotLinearInertia = 48; // kg TODO
     public static final double kDriveAnalyticalLinearKa = 12.0 /* V */ / ((kDriveGearReduction * kMiniCIMStallTorque * kAssumedTorqueEfficiency * 6) / (kRobotLinearInertia * kDriveWheelRadiusMeters * kDriveWheelRadiusMeters));
     public static final double kDriveLinearKa = 0.015470549986407171 / 2.0 * Constants.kDriveWheelDiameterInches * kGearRatioScalar; // V / rad/s^2
     public static final double kDriveAngularKa = 0.00517 / 2.0 * Constants.kDriveWheelDiameterInches * kGearRatioScalar; // V per rad/s^2
@@ -97,10 +100,10 @@ public class Constants {
     public static final Translation2d kVehicleToTurretTranslation = new Translation2d(-6.9, 0);
 
     // Shooter
-    public static final double kShooterKp = 0.0065;
+    public static final double kShooterKp = 0.00685;
     public static final double kShooterKi = 0.0;
     public static final double kShooterKd = 0.0;
-    public static final double kShooterKf = 0.03833127788;
+    public static final double kShooterKf = 0.04033127788;
     public static final double kShooterEncoderPPR = 4096.0;
     public static final double kShooterOutputToEncoderRatio = 1.0;
     public static final double kShooterTicksPerRevolution = kShooterOutputToEncoderRatio * kShooterEncoderPPR; // based on gear reduction between encoder and output shaft, and encoder ppr
@@ -136,8 +139,8 @@ public class Constants {
 
     // Limelight TODO change values for 2022 bot
     public static final double kGoalMaxHeightInches = 104; // Height from carpet to top of upper hub 
-    public static final double kLimelightAngleHorizontalPlaneToLens = 30; // Rotation Angle
-    public static final double kLimelightLensOffGroundHeight = 44.25;        // Measurment from carpet to center or LL lens
+    public static final double kLimelightAngleHorizontalPlaneToLens = 27.2; // Rotation Angle
+    public static final double kLimelightLensOffGroundHeight = 45.875;        // Measurment from carpet to center or LL lens
 
     // Interpolation Mao
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kLobHoodMap = new InterpolatingTreeMap<>();
@@ -153,6 +156,7 @@ public class Constants {
 
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kLobRPMMap = new InterpolatingTreeMap<>();
     static {
+
         kLobRPMMap.put(new InterpolatingDouble(48.0), new InterpolatingDouble(1900.0));
         kLobRPMMap.put(new InterpolatingDouble(84.0), new InterpolatingDouble(1900.0));
         kLobRPMMap.put(new InterpolatingDouble(114.0), new InterpolatingDouble(2100.0));

@@ -61,6 +61,7 @@ public class Shooter extends Subsystem {
         public double velocity_ticks_per_100_ms = 0.0; // Talon SRX + 775 Pro
         public double velocity_rpm = 0.0;              // Talon SRX + 775 Pro
         public double calculated_rpm = 0.0;
+        public double offset_rpm = 0.0;
     }
 
     private PeriodicIO mPeriodicIO;
@@ -110,6 +111,8 @@ public class Shooter extends Subsystem {
         mPeriodicIO.stator_current = mShooterMaster.getStatorCurrent();
 
         mPeriodicIO.velocity_ticks_per_100_ms = mShooterMaster.getSelectedSensorVelocity(0);
+
+        mPeriodicIO.offset_rpm = getOffsetRPM();
 
         mPeriodicIO.velocity_rpm = nativeUnitsToRPM(mPeriodicIO.velocity_ticks_per_100_ms);
         mPeriodicIO.calculated_rpm = calculatedDesiredRPM();
@@ -183,6 +186,11 @@ public class Shooter extends Subsystem {
         return mPeriodicIO.calculated_rpm;
     }
 
+    
+    public synchronized double getOffsetRPM() {
+        return mPeriodicIO.offset_rpm;
+    }
+
     // Shooter modifier methods 
     public synchronized void setOpenLoop(double power) {
         if (mShooterControlState != ShooterControlState.OPEN_LOOP) {
@@ -198,6 +206,10 @@ public class Shooter extends Subsystem {
         }
 
         mPeriodicIO.shooter_demand = rpmToNativeUnits(rpm);
+    }
+
+    public synchronized void setOffsetRPM(double rpm) {
+        mPeriodicIO.offset_rpm += rpm;
     }
 
     public synchronized boolean isAtSetpoint() {
