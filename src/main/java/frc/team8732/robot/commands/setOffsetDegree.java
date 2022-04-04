@@ -5,21 +5,21 @@
 package frc.team8732.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.team8732.robot.subsystems.Shooter;
+import frc.team8732.robot.subsystems.Hood;
 
-public class setOffsetRPM extends CommandBase {
-  /** Creates a new setOffsetRPM. */
-  Shooter mShooter = Shooter.getInstance();
-  double offsetRPM;
-  public setOffsetRPM(double offsetRPM) {
+public class setOffsetDegree extends CommandBase {
+  /** Creates a new setOffsetDegree. */
+  Hood mHood = Hood.getInstance();
+  double offsetDegree;
+  public setOffsetDegree(double offsetDegree) {
     // Use addRequirements() here to declare subsystem dependencies.
-    this.offsetRPM = offsetRPM;
+    this.offsetDegree = offsetDegree;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    mShooter.setOffsetRPM(offsetRPM);
+    mHood.setOffsetDegree(offsetDegree);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -33,6 +33,6 @@ public class setOffsetRPM extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return true;
+    return false;
   }
 }

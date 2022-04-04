@@ -43,10 +43,6 @@ public class Robot extends TimedRobot {
   private final Limelight mLimelight = Limelight.getInstance();
   private final Climb mClimb = Climb.getInstance();
 
-
-  // Robot State
-  private final RobotState mRobotState = RobotState.getInstance();
-
   // Constructor
   Robot() {
     CrashTracker.logRobotConstruction();
@@ -66,9 +62,9 @@ public class Robot extends TimedRobot {
         mSubsystemManager.setSubsystems(
           RobotStateEstimator.getInstance(),
           mDrive,
-          mShooter,
           mIntake,
           mHood,
+          mShooter,
           mLimelight,
           mClimb
         );
@@ -234,7 +230,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    System.out.println();
+  }
 
   /** This function is called periodically during test mode. */
   @Override

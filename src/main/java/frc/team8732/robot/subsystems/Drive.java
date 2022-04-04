@@ -140,6 +140,9 @@ public class Drive extends Subsystem {
         // Voltage Comp
         TalonUtil.checkError(talon.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs), "Could not config drive voltage comp saturation");
         talon.enableVoltageCompensation(true);
+
+        // Controller Deadband
+        talon.configNeutralDeadband(.08, Constants.kLongCANTimeoutMs);
     }
 
     private Drive() {
@@ -470,14 +473,16 @@ public class Drive extends Subsystem {
     public synchronized void driveWithJoystick() {
         GameController driverController = RobotContainer.getInstance().getDriveGameController();
 
-        double throttleScalar = .55;
-        double wheelScalar = .40;
+        double throttleScalar = .575;
+        double wheelScalar = .325;
 
         double throttle = (-1 * driverController.getLeftYAxis()) * throttleScalar; 
         double wheel = (driverController.getRightXAxis() * wheelScalar);
     
         mPeriodicIO.left_demand = wheel + throttle ;
         mPeriodicIO.right_demand = throttle - wheel;
+
+        setBrakeMode(true);
 
         mLeftMaster.set(ControlMode.PercentOutput, mPeriodicIO.left_demand);
         mRightMaster.set(ControlMode.PercentOutput, mPeriodicIO.right_demand);
@@ -488,7 +493,7 @@ public class Drive extends Subsystem {
         Limelight limelight = Limelight.getInstance();
         GameController driverController = RobotContainer.getInstance().getDriveGameController();
 
-        double throttleScalar = .45;
+        double throttleScalar = .30;
         double wheelScalar = .30;
 
         double throttle = (-1 * driverController.getLeftYAxis()) * throttleScalar; 
@@ -502,9 +507,9 @@ public class Drive extends Subsystem {
         double kCameraClose = 10;
         double kCameraMid = 15;
         double kCameraFar = 20; 
-        double kCameraDriveClose = .05;
-        double kCameraDriveMid = .033;
-        double kCameraDriveFar = .023;
+        double kCameraDriveClose = .04;
+        double kCameraDriveMid = .028;
+        double kCameraDriveFar = .022;
 
         if (limelight.hasTarget()) {
             double kCameraDrive = kCameraDriveClose;
@@ -539,9 +544,9 @@ public class Drive extends Subsystem {
         double kCameraClose = 10;
         double kCameraMid = 15;
         double kCameraFar = 20; 
-        double kCameraDriveClose = .05;
-        double kCameraDriveMid = .033;
-        double kCameraDriveFar = .023;
+        double kCameraDriveClose = .04;
+        double kCameraDriveMid = .028;
+        double kCameraDriveFar = .020;
 
         if (limelight.hasTarget()) {
             double kCameraDrive = kCameraDriveClose;

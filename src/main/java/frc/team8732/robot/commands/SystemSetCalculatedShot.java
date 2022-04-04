@@ -30,6 +30,7 @@ public class SystemSetCalculatedShot extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    mShooter.setWantsShoot(true);
     mDrive.setControlState(DriveControlState.LIMELIGHT);
     mShooter.setRPM(Constants.kShooterIdleRPM);
     mHood.setDegree(Constants.kHoodIdleDegree);
@@ -39,7 +40,7 @@ public class SystemSetCalculatedShot extends CommandBase {
   @Override
   public void execute() {
     if(mLimelight.hasTarget()){
-      rpm = mShooter.getCalculatedRPM() + mShooter.getOffsetRPM();
+      rpm = mShooter.getCalculatedRPM();
       mShooter.setRPM(rpm);
       lastValidRPM = rpm;
 
@@ -57,6 +58,7 @@ public class SystemSetCalculatedShot extends CommandBase {
   public void end(boolean interrupted) {
     mShooter.setRPM(Constants.kShooterIdleRPM);
     mHood.setDegree(Constants.kHoodIdleDegree);
+    mShooter.setWantsShoot(false);
   }
 
   // Returns true when the command should end.

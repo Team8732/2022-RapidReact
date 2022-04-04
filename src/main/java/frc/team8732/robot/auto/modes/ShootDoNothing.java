@@ -25,8 +25,8 @@ public class ShootDoNothing extends AutoModeBase {
     @Override
     protected void routine() throws AutoModeEndedException {
         runAction(new IntakeSystemStateAction(IntakeSystemState.RELEASE)); // Drop Intake
+        runAction(new WaitAction(.5)); // Wait to spin up and release
         runAction(new SystemIdleAction()); // Set Hood, Shooter, and Intake Idle
-        runAction(new WaitAction(2)); // Wait to spin up and release
         runAction(new IntakeSystemStateAction(IntakeSystemState.INTAKING)); // Drop Intake
         runAction(new MovePercentAction(.4));
         runAction(new WaitAction(1.25));

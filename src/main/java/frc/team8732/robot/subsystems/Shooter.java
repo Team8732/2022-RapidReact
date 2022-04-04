@@ -49,9 +49,11 @@ public class Shooter extends Subsystem {
     // Hardware States
     private final int kPIDSlot = 0;
 
+    private boolean wantsShoot = false;
+
     public static class PeriodicIO {
         // MOTOR OUTPUT
-        public double shooter_demand = 0.0;
+        public double demand = 0.0;
 
         // INPUTS
         public double timestamp;
@@ -61,8 +63,8 @@ public class Shooter extends Subsystem {
         public double velocity_ticks_per_100_ms = 0.0; // Talon SRX + 775 Pro
         public double velocity_rpm = 0.0;              // Talon SRX + 775 Pro
         public double calculated_rpm = 0.0;
-        public double offset_rpm = 0.0;
     }
+    public double offset_rpm = 0.0;
 
     private PeriodicIO mPeriodicIO;
     private ReflectingCSVWriter<PeriodicIO> mCSVWriter = null;
@@ -112,8 +114,6 @@ public class Shooter extends Subsystem {
 
         mPeriodicIO.velocity_ticks_per_100_ms = mShooterMaster.getSelectedSensorVelocity(0);
 
-        mPeriodicIO.offset_rpm = getOffsetRPM();
-
         mPeriodicIO.velocity_rpm = nativeUnitsToRPM(mPeriodicIO.velocity_ticks_per_100_ms);
         mPeriodicIO.calculated_rpm = calculatedDesiredRPM();
         if (mCSVWriter != null) {
@@ -124,9 +124,9 @@ public class Shooter extends Subsystem {
     @Override
     public void writePeriodicOutputs() {
         if (mShooterControlState == ShooterControlState.OPEN_LOOP) {
-            mShooterMaster.set(ControlMode.PercentOutput, mPeriodicIO.shooter_demand);
+            mShooterMaster.set(ControlMode.PercentOutput, mPeriodicIO.demand);
         } else if (mShooterControlState == ShooterControlState.VELOCITY) {
-            mShooterMaster.set(ControlMode.Velocity, mPeriodicIO.shooter_demand);
+            mShooterMaster.set(ControlMode.Velocity, mPeriodicIO.demand);
         }
     }
 
@@ -179,16 +179,15 @@ public class Shooter extends Subsystem {
     }
 
     public synchronized double getDemandRPM() {
-        return nativeUnitsToRPM(mPeriodicIO.shooter_demand);
+        return nativeUnitsToRPM(mPeriodicIO.demand);
+    }
+
+    public synchronized double getOffsetRPM() {
+        return nativeUnitsToRPM(offset_rpm);
     }
 
     public synchronized double getCalculatedRPM() {
         return mPeriodicIO.calculated_rpm;
-    }
-
-    
-    public synchronized double getOffsetRPM() {
-        return mPeriodicIO.offset_rpm;
     }
 
     // Shooter modifier methods 
@@ -197,7 +196,12 @@ public class Shooter extends Subsystem {
             mShooterControlState = ShooterControlState.OPEN_LOOP;
         }
 
-        mPeriodicIO.shooter_demand = power;
+        mPeriodicIO.demand = power;
+    }
+
+    
+    public synchronized void setOffsetRPM(double offset) {
+        offset_rpm += offset;
     }
 
     public synchronized void setRPM(double rpm) {
@@ -205,16 +209,20 @@ public class Shooter extends Subsystem {
             mShooterControlState = ShooterControlState.VELOCITY;
         }
 
-        mPeriodicIO.shooter_demand = rpmToNativeUnits(rpm);
-    }
-
-    public synchronized void setOffsetRPM(double rpm) {
-        mPeriodicIO.offset_rpm += rpm;
+        mPeriodicIO.demand = rpmToNativeUnits(rpm);
     }
 
     public synchronized boolean isAtSetpoint() {
         return Util.epsilonEquals(getRPM(), getDemandRPM(),
                 Constants.kShooterAllowableErrorRPM);
+    }
+
+    public synchronized void setWantsShoot(boolean shoot) {
+        wantsShoot = shoot;
+    }
+
+    public synchronized boolean getWantsShoot() {
+        return wantsShoot;
     }
 
     @Override
@@ -240,14 +248,15 @@ public class Shooter extends Subsystem {
             mCSVWriter = null;
         }
     }
+    public double speed;
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Shooter Master RPM", getRPM());
-        SmartDashboard.putNumber("Shooter Demand", mShooterControlState == ShooterControlState.OPEN_LOOP ? mPeriodicIO.shooter_demand
-                : (mShooterControlState == ShooterControlState.VELOCITY ? nativeUnitsToRPM(mPeriodicIO.shooter_demand) : 0.0));
+        SmartDashboard.putNumber("Shooter Demand", mShooterControlState == ShooterControlState.OPEN_LOOP ? mPeriodicIO.demand
+                : (mShooterControlState == ShooterControlState.VELOCITY ? nativeUnitsToRPM(mPeriodicIO.demand) : 0.0));
         SmartDashboard.putBoolean("Shooter At Setpoint", isAtSetpoint());
         SmartDashboard.putNumber("Calcuated RPM", getCalculatedRPM());
-
+        SmartDashboard.putNumber("Offset RPM", getOffsetRPM());
         if (mCSVWriter != null) {
             mCSVWriter.write();
         }

@@ -33,11 +33,12 @@ public class Constants {
     public static final int kShooterSlaveID = 12;
     public static final int kShooterIndexerID = 4;
 
-    // Climb 
-    public static final int kClimbMotorID = 8;
-
     // Hood
     public static final int kHoodMotorID = 11;
+
+    // Climb 
+    public static final int kClimbMasterID = 7;
+    public static final int kClimbSlaveID = 8;
 
     public static final double kLooperDt = 0.01;
 
@@ -100,25 +101,26 @@ public class Constants {
     public static final Translation2d kVehicleToTurretTranslation = new Translation2d(-6.9, 0);
 
     // Shooter
-    public static final double kShooterKp = 0.00685;
+    public static final double kShooterKp = 0.0067;
     public static final double kShooterKi = 0.0;
     public static final double kShooterKd = 0.0;
-    public static final double kShooterKf = 0.04033127788;
+    public static final double kShooterKf = 0.03873127788;
     public static final double kShooterEncoderPPR = 4096.0;
     public static final double kShooterOutputToEncoderRatio = 1.0;
     public static final double kShooterTicksPerRevolution = kShooterOutputToEncoderRatio * kShooterEncoderPPR; // based on gear reduction between encoder and output shaft, and encoder ppr
-    public static final double kShooterAllowableErrorRPM = 150.0; // TODO Tune for 2022 Upper Hub
+    public static final double kShooterAllowableErrorRPM = 100.0; // TODO Tune for 2022 Upper Hub
         
         // Speeds
-        public static final double kShooterIdleRPM = 1500;
-        public static final double kShooterFenderRPM = 1900;
-        public static final double kShooterProtectedRPM = 2400;
-        public static final double kShooterTerminalRPM = 2600; 
+        public static final double kShooterIdleRPM = 0;
+        public static final double kShooterIdleRPMAuto = 2000;
+        public static final double kShooterFenderRPM = 2150;
+        public static final double kShooterProtectedRPM = 2700;
+        public static final double kShooterTerminalRPM = 3150; 
 
     // Hood
     public static final double kHoodHomePositionDegress = 55;
     public static final double kHoodMaxPositionDegress = 55;
-    public static final double kHoodMinPositionDegress = 0;
+    public static final double kHoodMinPositionDegress = 1;
     public static final double kHoodKp = 0.5;
     public static final double kHoodKi = 0.008;
     public static final double kHoodKd = 0.02;
@@ -129,40 +131,68 @@ public class Constants {
     public static final double kHoodOutputToEncoderRatio = 392.0/18.0;
     public static final double kHoodTicksPerRevolution = kHoodOutputToEncoderRatio * kHoodEncoderPPR; // based on gear reduction between encoder and output shaft, and encoder ppr
     public static final double kHoodTicksPerDegree = kHoodTicksPerRevolution / 360.0;
-    public static final double kHoodPositionDeadband = 2; // TODO Tune for 2022 Upper Hub
+    public static final double kHoodPositionDeadband = 1; // TODO Tune for 2022 Upper Hub
 
         // Degrees
         public static final double kHoodIdleDegree = 30;
-        public static final double kHoodFenderDegree = 18;
-        public static final double kHoodProtectedDegree = 34;
+        public static final double kHoodFenderDegree = 5;
+        public static final double kHoodProtectedDegree = 33;
         public static final double kHoodTerminalDegree = 42;
+
+    // Climb
+    public static final double kClimbHomePositionInches = 45.5;
+    public static final double kClimbMaxPositionInches = 66;
+    public static final double kClimbMinPositionInches = 45.5;
+    public static final double kClimbHomePositionTicks = 0;
+    public static final double kClimbMaxPositionTicks = 53000;
+    public static final double kClimbMinPositionTicks = 308;
+    public static final double kClimbKp = 0.5;
+    public static final double kClimbKi = 0.008;
+    public static final double kClimbKd = 0.02;
+    public static final double kClimbKf = 0.045;
+    public static final double kClimbEncoderPPR = 2048.0;
+    public static final double kClimbMotionCruiseVelocity = 6000;
+    public static final double kClimbMotionAcceleration = 12000;
+    public static final double kClimbOutputToEncoderRatio = 36.0/2.0;
+    public static final double kClimbTicksPerRevolution = kClimbOutputToEncoderRatio * kClimbEncoderPPR; // based on gear reduction between encoder and output shaft, and encoder ppr
+    public static final double kClimbPositionDeadband = 1; 
+
+        // Heights
+        public static final double kClimbMidInches = 61;
+        public static final double kClimbMidTicks = 38000;
+
+        public static final double kClimbRetractedInches = 50;
+        public static final double kClimbRetractedTicks = 10000;
 
     // Limelight TODO change values for 2022 bot
     public static final double kGoalMaxHeightInches = 104; // Height from carpet to top of upper hub 
-    public static final double kLimelightAngleHorizontalPlaneToLens = 27.2; // Rotation Angle
-    public static final double kLimelightLensOffGroundHeight = 45.875;        // Measurment from carpet to center or LL lens
+    public static final double kLimelightAngleHorizontalPlaneToLens = 27.5; // Rotation Angle
+    public static final double kLimelightLensOffGroundHeight = 43.0625;        // Measurment from carpet to center or LL lens
 
-    // Interpolation Mao
+    // Interpolation Map
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kLobHoodMap = new InterpolatingTreeMap<>();
     static {
-        kLobHoodMap.put(new InterpolatingDouble(48.0), new InterpolatingDouble(11.0));
-        kLobHoodMap.put(new InterpolatingDouble(84.0), new InterpolatingDouble(22.0));
-        kLobHoodMap.put(new InterpolatingDouble(114.0), new InterpolatingDouble(29.0));
-        kLobHoodMap.put(new InterpolatingDouble(135.0), new InterpolatingDouble(32.0));
-        kLobHoodMap.put(new InterpolatingDouble(184.0), new InterpolatingDouble(39.0));
-        kLobHoodMap.put(new InterpolatingDouble(226.0), new InterpolatingDouble(42.0));
-        kLobHoodMap.put(new InterpolatingDouble(276.0), new InterpolatingDouble(45.0));
+        kLobHoodMap.put(new InterpolatingDouble(56.0), new InterpolatingDouble(3.0));
+        kLobHoodMap.put(new InterpolatingDouble(87.0), new InterpolatingDouble(14.0));
+        kLobHoodMap.put(new InterpolatingDouble(107.0), new InterpolatingDouble(21.5)); //23
+        kLobHoodMap.put(new InterpolatingDouble(135.0), new InterpolatingDouble(29.0));
+        kLobHoodMap.put(new InterpolatingDouble(187.0), new InterpolatingDouble(33.0)); //33
+        kLobHoodMap.put(new InterpolatingDouble(232.0), new InterpolatingDouble(37.0));
+        kLobHoodMap.put(new InterpolatingDouble(262.0), new InterpolatingDouble(41.0));
+        kLobHoodMap.put(new InterpolatingDouble(300.0), new InterpolatingDouble(42.0));
     }
 
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kLobRPMMap = new InterpolatingTreeMap<>();
     static {
 
-        kLobRPMMap.put(new InterpolatingDouble(48.0), new InterpolatingDouble(1900.0));
-        kLobRPMMap.put(new InterpolatingDouble(84.0), new InterpolatingDouble(1900.0));
-        kLobRPMMap.put(new InterpolatingDouble(114.0), new InterpolatingDouble(2100.0));
-        kLobRPMMap.put(new InterpolatingDouble(135.0), new InterpolatingDouble(2125.0));
-        kLobRPMMap.put(new InterpolatingDouble(184.0), new InterpolatingDouble(2350.0));
-        kLobRPMMap.put(new InterpolatingDouble(226.0), new InterpolatingDouble(2600.0));
-        kLobRPMMap.put(new InterpolatingDouble(276.0), new InterpolatingDouble(2900.0));
+        kLobRPMMap.put(new InterpolatingDouble(56.0), new InterpolatingDouble(2150.0));
+        kLobRPMMap.put(new InterpolatingDouble(87.0), new InterpolatingDouble(2250.0));
+        kLobRPMMap.put(new InterpolatingDouble(107.0), new InterpolatingDouble(2360.0));
+        kLobRPMMap.put(new InterpolatingDouble(135.0), new InterpolatingDouble(2450.0));
+        kLobRPMMap.put(new InterpolatingDouble(187.0), new InterpolatingDouble(2700.0)); //2750
+        kLobRPMMap.put(new InterpolatingDouble(232.0), new InterpolatingDouble(2900.0)); //2950
+        kLobRPMMap.put(new InterpolatingDouble(262.0), new InterpolatingDouble(3100.0)); 
+        kLobRPMMap.put(new InterpolatingDouble(300.0), new InterpolatingDouble(3275.0));
+
     }
 }

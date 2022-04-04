@@ -24,18 +24,16 @@ public class FourBallAutoMode extends AutoModeBase {
     @Override
     protected void routine() throws AutoModeEndedException {
         runAction(new IntakeSystemStateAction(IntakeSystemState.RELEASE)); // Drop Intake
-        runAction(new SystemIdleAction()); // Set Hood, Shooter, and Intake Idle
         runAction(new WaitAction(.5)); // Wait to spin up and release
+        runAction(new SystemIdleAction()); // Set Hood, Shooter, and Intake Idle
         runAction(new IntakeSystemStateAction(IntakeSystemState.INTAKING)); // Start intaking sequence 
         runAction(new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().tarmach2StartToBall4, true)); // Drive first ball pick up
-        runAction(new WaitAction(.25)); // Path stop time
-        runAction(new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().Ball4ToShootPose2)); // Drive to score pose
         runAction(new ParallelAction(List.of(
             new SystemSetCalculatedShotAction(), // AIM to goal and set calc RPM + Hood
             new SeriesAction(List.of(
-                new WaitAction(.5), // Spin Up
+                new WaitAction(.75), // Spin Up
                 new IntakeSystemStateAction(IntakeSystemState.SHOOTING), // Shoot
-                new WaitAction(1.2), // Shoot Timeout
+                new WaitAction(1.75), // Shoot Timeout
                 new DriveSystemStateAction(DriveControlState.PATH_FOLLOWING), // Stop SystemCalcAction
                 new SystemIdleAction() // Set Hood, Shooter, and Intake Idle
             ))
@@ -43,16 +41,17 @@ public class FourBallAutoMode extends AutoModeBase {
         ));
 
         // Auto Shot Idle
+        runAction(new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().Ball4ToT2TurningPose));
         runAction(new IntakeSystemStateAction(IntakeSystemState.INTAKING));
-        runAction(new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().ShootPose2ToBall1));
-        runAction(new WaitAction(.75)); // Intake
+        runAction(new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().Tarmach2TurningPoseToBall1));
+        runAction(new WaitAction(.25)); // Intake
         runAction(new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().Ball1ToShootPose2));
         runAction(new ParallelAction(List.of(
             new SystemSetCalculatedShotAction(), // AIM to goal and set calc RPM + Hood
             new SeriesAction(List.of(
                 new WaitAction(.35), // Spin Up
-                new IntakeSystemStateAction(IntakeSystemState.SHOOTING), // Shoot
-                new WaitAction(1), // Shoot Timeout
+                new IntakeSystemStateAction(IntakeSystemState.SHOOTING_AUTO), // Shoot
+                new WaitAction(2.5), // Shoot Timeout
                 new DriveSystemStateAction(DriveControlState.PATH_FOLLOWING), // Stop SystemCalcAction
                 new SystemIdleAction() // Set Hood, Shooter, and Intake Idle
             ))

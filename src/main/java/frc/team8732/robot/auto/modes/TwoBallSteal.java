@@ -24,17 +24,17 @@ public class TwoBallSteal extends AutoModeBase {
     @Override
     protected void routine() throws AutoModeEndedException {
         runAction(new IntakeSystemStateAction(IntakeSystemState.RELEASE)); // Drop Intake
-        runAction(new SystemIdleAction()); // Set Hood, Shooter, and Intake Idle
         runAction(new WaitAction(.5)); // Wait to spin up and release
+        runAction(new SystemIdleAction()); // Set Hood, Shooter, and Intake Idle
         runAction(new IntakeSystemStateAction(IntakeSystemState.INTAKING)); // Start intaking sequence 
         runAction(new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().tarmach2StartToBall4, true)); // Drive first ball pick up
         runAction(new WaitAction(1)); // Path stop time
         runAction(new ParallelAction(List.of(
             new SystemSetCalculatedShotAction(), // AIM to goal and set calc RPM + Hood
             new SeriesAction(List.of(
-                new WaitAction(1), // Spin Up
+                new WaitAction(.25), // Spin Up
                 new IntakeSystemStateAction(IntakeSystemState.SHOOTING), // Shoot
-                new WaitAction(2.5), // Shoot Timeout
+                new WaitAction(1.25), // Shoot Timeout
                 new DriveSystemStateAction(DriveControlState.PATH_FOLLOWING), // Stop SystemCalcAction
                 new SystemIdleAction() // Set Hood, Shooter, and Intake Idle
             ))
@@ -45,11 +45,11 @@ public class TwoBallSteal extends AutoModeBase {
         runAction(new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().Ball4ToT2TurningPose));
         runAction(new IntakeSystemStateAction(IntakeSystemState.INTAKING));
         runAction(new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().Tarmach2TurningPoseTokBall6PoseOpp));
-        runAction(new WaitAction(.5));
+        runAction(new WaitAction(.1));
         runAction(new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().Ball6PoseOppToTarmach2TurningPose));
-        runAction(new WaitAction(.5));
+        runAction(new WaitAction(.1));
         runAction(new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().Tarmach2TurningPoseTokBall5PoseOpp));
-        runAction(new WaitAction(.5));
+        runAction(new WaitAction(.1));
         runAction(new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().Ball5PoseOppToTarmach2DropOff));
         runAction(new IntakeSystemStateAction(IntakeSystemState.OUTTAKING));
 

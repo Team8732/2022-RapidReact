@@ -6,16 +6,14 @@ package frc.team8732.robot;
 
 import frc.team8732.robot.commands.SystemSetCalculatedShot;
 import frc.team8732.robot.commands.SystemSetDefinedShot;
-import frc.team8732.robot.commands.setClimbSystemState;
+import frc.team8732.robot.commands.setClimbPercent;
 import frc.team8732.robot.commands.setDriveControlState;
 import frc.team8732.robot.commands.setIntakeSystemState;
-import frc.team8732.robot.commands.setOffsetRPM;
 import frc.team8732.robot.controller.GameController;
 import frc.team8732.robot.controller.Playstation;
 import frc.team8732.robot.subsystems.Drive.DriveControlState;
 import frc.team8732.robot.subsystems.Intake.IntakeSystemState;
 import frc.team8732.robot.subsystems.Shooter;
-import frc.team8732.robot.subsystems.Climb.ClimbSystemState;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -58,6 +56,16 @@ public class RobotContainer {
     mDriver.getButtonX().whenReleased(new setIntakeSystemState(IntakeSystemState.IDLE));
     mDriver.getButtonX().whenReleased(new setDriveControlState(DriveControlState.JOYSTICK));
 
+    mDriver.getRightBumper().whenPressed(new setIntakeSystemState(IntakeSystemState.INTAKING));
+    mDriver.getRightBumper().whenReleased(new setIntakeSystemState(IntakeSystemState.IDLE));
+
+    mDriver.getButtonA().whenPressed(new SystemSetDefinedShot(Constants.kShooterFenderRPM, Constants.kHoodFenderDegree)); // Fender Shot
+
+    mDriver.getRightTrigger().whenPressed(new setIntakeSystemState(IntakeSystemState.RELEASE));
+    mDriver.getRightTrigger().whenReleased(new setIntakeSystemState(IntakeSystemState.IDLE));
+
+    // mDriver.getButtonA().whenPressed(new setIntakeSystemState(IntakeSystemState.TEST));
+
     // Operator
     mOperator.getRightBumper().whenPressed(new setIntakeSystemState(IntakeSystemState.INTAKING));
     mOperator.getRightBumper().whenReleased(new setIntakeSystemState(IntakeSystemState.IDLE));
@@ -76,14 +84,12 @@ public class RobotContainer {
 
     mOperator.getButtonX().whenPressed(new SystemSetCalculatedShot()); // Calculated Shot
 
-    mOperator.getDPadUp().whenPressed(new setClimbSystemState(ClimbSystemState.UP));
-    mOperator.getDPadUp().whenReleased(new setClimbSystemState(ClimbSystemState.IDLE));
+    mOperator.getDPadUp().whenPressed(new setClimbPercent(.8));
+    mOperator.getDPadUp().whenReleased(new setClimbPercent(0));
 
-    mOperator.getDPadDown().whenPressed(new setClimbSystemState(ClimbSystemState.DOWN));
-    mOperator.getDPadDown().whenReleased(new setClimbSystemState(ClimbSystemState.IDLE));
 
-    mOperator.getDPadRight().whenPressed(new setOffsetRPM(20));
-    mOperator.getDPadLeft().whenPressed(new setOffsetRPM(-20));
+    mOperator.getDPadDown().whenPressed(new setClimbPercent(-.8));
+    mOperator.getDPadDown().whenReleased(new setClimbPercent(0));  
   }
 
   public GameController getDriveGameController(){

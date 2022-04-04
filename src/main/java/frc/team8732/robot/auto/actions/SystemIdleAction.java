@@ -25,7 +25,7 @@ public class SystemIdleAction implements Action {
     @Override
     public void start() {
         mIntake.setSystemState(IntakeSystemState.IDLE);
-        mShooter.setRPM(Constants.kShooterIdleRPM);
+        mShooter.setRPM(Constants.kShooterIdleRPMAuto);
         mHood.setDegree(Constants.kHoodIdleDegree);
     }
 

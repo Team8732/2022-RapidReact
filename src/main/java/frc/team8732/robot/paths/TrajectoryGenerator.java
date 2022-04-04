@@ -19,8 +19,8 @@ public class TrajectoryGenerator {
 
 
     // TODO tune
-    private static final double kMaxVel = 120.0; // 150
-    private static final double kMaxAccel = 60.0;
+    private static final double kMaxVel = 160.0; // 150
+    private static final double kMaxAccel = 80.0;
     private static final double kMaxVoltage = 9.0;
 
     private final DriveMotionPlanner mMotionPlanner;
@@ -84,8 +84,8 @@ public class TrajectoryGenerator {
         public static final Translation2d kMidVeihcleToFrontVechile = new Translation2d(23.25, 23.25); //15.5
         public static final Translation2d kHalfBall = new Translation2d(-4.75, -4.75);
 
-        public static final Pose2d kTarmach1StartingPose = new Pose2d(new Translation2d(254, -58), // Conrner of tarmach 1 facing the alliance wall X = 254 Y = -58
-                Rotation2d.fromDegrees(-147));
+        public static final Pose2d kTarmach1StartingPose = new Pose2d(new Translation2d(255, -61), // Conrner of tarmach 1 facing the alliance wall X = 254 Y = -58
+                Rotation2d.fromDegrees(-140));
 
         public static final Pose2d kBall1Pose = new Pose2d(new Translation2d(41.920 + (kMidVeihcleToFrontVechile.x() + kHalfBall.x()), -117.820 + (kMidVeihcleToFrontVechile.y() + kHalfBall.y())), // Ball @ loading zone X = 41.920 Y = -117.820
                 Rotation2d.fromDegrees(-133.75));
@@ -93,14 +93,14 @@ public class TrajectoryGenerator {
         public static final Pose2d kBall2Pose = new Pose2d(new Translation2d(199.054 + (kMidVeihcleToFrontVechile.x() + kHalfBall.x()), -88.429205 + (kMidVeihcleToFrontVechile.y() + kHalfBall.y())), // Alliance cargo closest to tarmach 2 X = 199.054 Y = -88.429205
                 Rotation2d.fromDegrees(-135));
 
-        public static final Pose2d kBall3Pose = new Pose2d(new Translation2d(290, -133), // Alliance cargo furthest from tarmach 2 X = 298.090 Y = -150.864
-                Rotation2d.fromDegrees(-65));
+        public static final Pose2d kBall3Pose = new Pose2d(new Translation2d(298, -133), // Alliance cargo furthest from tarmach 2 X = 298.090 Y = -150.864
+                Rotation2d.fromDegrees(-90));
 
-        public static final Pose2d kTarmach1ShootPose = new Pose2d(new Translation2d(149, -56), //296.5 -60
-                Rotation2d.fromDegrees(-167));
+        public static final Pose2d kTarmach1ShootPose = new Pose2d(new Translation2d(292, -70), //296.5 -60
+                Rotation2d.fromDegrees(-114));
 
         // Tarmach 2 (Hanger Zone)
-        public static final Pose2d kTarmach2StartingPose = new Pose2d(new Translation2d(237, 44), // Front Bumpers on tape facing Ball 4 & Hanger Zone
+        public static final Pose2d kTarmach2StartingPose = new Pose2d(new Translation2d(237, 45), // Front Bumpers on tape facing Ball 4 & Hanger Zone
                 Rotation2d.fromDegrees(135));
 
         public static final Pose2d kBall4Pose = new Pose2d(new Translation2d(194.603643 + (kMidVeihcleToFrontVechile.x() + kHalfBall.x()), 81.779 - (kMidVeihcleToFrontVechile.y() + kHalfBall.y())), // Alliance cargo closest to tarmach 2 X = 194.603643 Y = 81.779
@@ -118,11 +118,17 @@ public class TrajectoryGenerator {
         public static final Pose2d kBall1T2MidPose = new Pose2d(new Translation2d(160, 15),
                 Rotation2d.fromDegrees(-115.5));  
 
-        public static final Pose2d kTarmach2TurningPose = new Pose2d(new Translation2d(269, 24),
+        public static final Pose2d kTarmach2TurningPose = new Pose2d(new Translation2d(258, 26),
                 Rotation2d.fromDegrees(157));  
 
         public static final Pose2d kTarmach2DropOff = new Pose2d(new Translation2d(158, 97),
-                Rotation2d.fromDegrees(180)); 
+                Rotation2d.fromDegrees(180));
+        
+        public static final Pose2d kTarmach2StartToBall3 = new Pose2d(new Translation2d(298, -90),
+                Rotation2d.fromDegrees(-90)); 
+
+        public static final Pose2d kShootPoseTerminalMid = new Pose2d(new Translation2d(85, -93),
+                Rotation2d.fromDegrees(-154)); 
 
     public class TrajectorySet {
         public final Trajectory<TimedState<Pose2dWithCurvature>> testTrajectory;
@@ -131,7 +137,7 @@ public class TrajectoryGenerator {
         public final Trajectory<TimedState<Pose2dWithCurvature>> tarmach1StartToBall2;
         public final Trajectory<TimedState<Pose2dWithCurvature>> Ball2ToBall1;
         public final Trajectory<TimedState<Pose2dWithCurvature>> Ball1ToShootPose1;
-        public final Trajectory<TimedState<Pose2dWithCurvature>> ShootPose1ToBall3;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> ShootPoseToBall3;
         public final Trajectory<TimedState<Pose2dWithCurvature>> Ball3ToShootPose1;
 
         public final Trajectory<TimedState<Pose2dWithCurvature>> tarmach2StartToBall4;
@@ -141,9 +147,15 @@ public class TrajectoryGenerator {
        
         public final Trajectory<TimedState<Pose2dWithCurvature>> Ball4ToT2TurningPose;
         public final Trajectory<TimedState<Pose2dWithCurvature>> Tarmach2TurningPoseTokBall6PoseOpp;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> Tarmach2TurningPoseToBall1;
+
+        
         public final Trajectory<TimedState<Pose2dWithCurvature>> Ball6PoseOppToTarmach2TurningPose;
         public final Trajectory<TimedState<Pose2dWithCurvature>> Tarmach2TurningPoseTokBall5PoseOpp;
         public final Trajectory<TimedState<Pose2dWithCurvature>> Ball5PoseOppToTarmach2DropOff;
+
+        // public final Trajectory<TimedState<Pose2dWithCurvature>> Tarmach2StartToBall3;
+
 
         private TrajectorySet() {
             testTrajectory = getTestTrajectory();
@@ -152,7 +164,7 @@ public class TrajectoryGenerator {
             tarmach1StartToBall2 = getTarmach1StartToBall2();
             Ball2ToBall1 = getBall2ToBall1();
             Ball1ToShootPose1 = getBall1ToShootPose1();
-            ShootPose1ToBall3 = getShootPoseToBall3();
+            ShootPoseToBall3 = getShootPoseToBall3();
             Ball3ToShootPose1 = getBall3ToShootPose1();
 
             tarmach2StartToBall4 = getTarmach2ToBall4();
@@ -162,9 +174,12 @@ public class TrajectoryGenerator {
 
             Ball4ToT2TurningPose = getBall4ToT2TurningPose();
             Tarmach2TurningPoseTokBall6PoseOpp = getTarmach2TurningPoseTokBall6PoseOpp();
+
             Ball6PoseOppToTarmach2TurningPose = getBall6PoseOppToTarmach2TurningPose();
+            Tarmach2TurningPoseToBall1 =  getTurnPoseToBall1();
             Tarmach2TurningPoseTokBall5PoseOpp = getTarmach2TurningPoseTokBall5PoseOpp();
             Ball5PoseOppToTarmach2DropOff = getBall5PoseOppToTarmach2DropOff();
+
         }
 
         private Trajectory<TimedState<Pose2dWithCurvature>> getTestTrajectory() {
@@ -186,49 +201,49 @@ public class TrajectoryGenerator {
         // 5 Ball Auto Trajectory 
 
         private Trajectory<TimedState<Pose2dWithCurvature>> getTarmach1StartToBall2() {
-            List<Pose2d> waypoints = new ArrayList<>();
-            waypoints.add(kTarmach1StartingPose);
-            waypoints.add(kBall2Pose);
+                List<Pose2d> waypoints = new ArrayList<>();
+                waypoints.add(kTarmach1StartingPose);
+                waypoints.add(kBall2Pose);
 
-            return generateTrajectory(false, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
-            kMaxVel, kMaxAccel, kMaxVoltage);
-    }
+                return generateTrajectory(false, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
+                kMaxVel, kMaxAccel, kMaxVoltage);
+        }
 
-    private Trajectory<TimedState<Pose2dWithCurvature>> getBall2ToBall1() {
-            List<Pose2d> waypoints = new ArrayList<>();
-            waypoints.add(kBall2Pose);
-            waypoints.add(kBall1Pose);
+        private Trajectory<TimedState<Pose2dWithCurvature>> getBall2ToBall1() {
+                List<Pose2d> waypoints = new ArrayList<>();
+                waypoints.add(kBall2Pose);
+                waypoints.add(kBall1Pose);
 
-            return generateTrajectory(false, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
-            kMaxVel, kMaxAccel, kMaxVoltage);
-    }
+                return generateTrajectory(false, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
+                kMaxVel, kMaxAccel, kMaxVoltage);
+        }
 
-    private Trajectory<TimedState<Pose2dWithCurvature>> getBall1ToShootPose1() {
-            List<Pose2d> waypoints = new ArrayList<>();
-            waypoints.add(kBall1Pose);
-            waypoints.add(kTarmach1ShootPose);
+        private Trajectory<TimedState<Pose2dWithCurvature>> getBall1ToShootPose1() {
+                List<Pose2d> waypoints = new ArrayList<>();
+                waypoints.add(kBall1Pose);
+                waypoints.add(kTarmach1ShootPose);
 
-            return generateTrajectory(true, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
-            kMaxVel, kMaxAccel, kMaxVoltage);
-    }
+                return generateTrajectory(true, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
+                kMaxVel, kMaxAccel, kMaxVoltage);
+        }
 
-    private Trajectory<TimedState<Pose2dWithCurvature>> getShootPoseToBall3() {
-            List<Pose2d> waypoints = new ArrayList<>();
-            waypoints.add(kTarmach1ShootPose);
-            waypoints.add(kBall3Pose);
+        private Trajectory<TimedState<Pose2dWithCurvature>> getShootPoseToBall3() {
+                List<Pose2d> waypoints = new ArrayList<>();
+                waypoints.add(kTarmach1ShootPose);
+                waypoints.add(kBall3Pose);
 
-            return generateTrajectory(false, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
-            kMaxVel, kMaxAccel, kMaxVoltage);
-    }
+                return generateTrajectory(false, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
+                kMaxVel, kMaxAccel, kMaxVoltage);
+        }
 
-    private Trajectory<TimedState<Pose2dWithCurvature>> getBall3ToShootPose1() {
-            List<Pose2d> waypoints = new ArrayList<>();
-            waypoints.add(kBall3Pose);
-            waypoints.add(kTarmach1ShootPose);
+        private Trajectory<TimedState<Pose2dWithCurvature>> getBall3ToShootPose1() {
+                List<Pose2d> waypoints = new ArrayList<>();
+                waypoints.add(kBall3Pose);
+                waypoints.add(kTarmach1ShootPose);
 
-            return generateTrajectory(true, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
-            kMaxVel, kMaxAccel, kMaxVoltage);
-    }
+                return generateTrajectory(true, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
+                kMaxVel, kMaxAccel, kMaxVoltage);
+        }
 
     
     private Trajectory<TimedState<Pose2dWithCurvature>> getTarmach2ToBall4() {
@@ -237,7 +252,7 @@ public class TrajectoryGenerator {
             waypoints.add(kBall4Pose);
 
             return generateTrajectory(false, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
-            kMaxVel, kMaxAccel, kMaxVoltage);
+                    kMaxVel, kMaxAccel, kMaxVoltage);
     }
     
     private Trajectory<TimedState<Pose2dWithCurvature>> getBall4ToShootPose2() {
@@ -261,7 +276,7 @@ public class TrajectoryGenerator {
     private Trajectory<TimedState<Pose2dWithCurvature>> getBall1ToShootPose2() {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(kBall1Pose);
-            waypoints.add(kTarmach2ShootPose);
+            waypoints.add(kShootPoseTerminalMid);
 
             return generateTrajectory(true, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
             kMaxVel, kMaxAccel, kMaxVoltage);
@@ -291,6 +306,15 @@ public class TrajectoryGenerator {
                 waypoints.add(kTarmach2TurningPose);
 
                 return generateTrajectory(true, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
+                kMaxVel, kMaxAccel, kMaxVoltage);
+        }
+
+        private Trajectory<TimedState<Pose2dWithCurvature>> getTurnPoseToBall1() {
+                List<Pose2d> waypoints = new ArrayList<>();
+                waypoints.add(kTarmach2TurningPose);
+                waypoints.add(kBall1Pose);
+
+                return generateTrajectory(false, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
                 kMaxVel, kMaxAccel, kMaxVoltage);
         }
 

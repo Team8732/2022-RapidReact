@@ -62,6 +62,7 @@ public class Hood extends Subsystem {
         public double position_ticks = 0.0;     // Talon SRX + 775 Pro
         public double position_degrees = 0.0;   // Talon SRX + 775 Pro
         public double calculated_degree = 0.0;
+        public double offset_degree = 0.0;
     }
 
     private PeriodicIO mPeriodicIO;
@@ -116,6 +117,7 @@ public class Hood extends Subsystem {
 
         mPeriodicIO.position_degrees = nativeUnitsToDegree(mPeriodicIO.position_ticks);
         mPeriodicIO.calculated_degree = calculatedDesiredDegree();
+        mPeriodicIO.offset_degree = getOffsetDegree();
 
         if (mCSVWriter != null) {
             mCSVWriter.add(mPeriodicIO);
@@ -190,6 +192,10 @@ public class Hood extends Subsystem {
         return mPeriodicIO.calculated_degree;
     }
 
+    public synchronized double getOffsetDegree() {
+        return mPeriodicIO.offset_degree;
+    }
+
     // Hood modifier methods 
     public synchronized void setOpenLoop(double power) {
         if (mHoodControlState != HoodControlState.OPEN_LOOP) {
@@ -197,6 +203,10 @@ public class Hood extends Subsystem {
         }
 
         mPeriodicIO.demand = power;
+    }
+
+    public synchronized void setOffsetDegree(double offset) {
+        mPeriodicIO.offset_degree = mPeriodicIO.offset_degree + offset;
     }
 
     private double limitHoodAngle(double targetDegree) {
@@ -246,6 +256,7 @@ public class Hood extends Subsystem {
             mCSVWriter = null;
         }
     }
+    public double angle;
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Hood Master Degree", getDegree());
@@ -253,6 +264,7 @@ public class Hood extends Subsystem {
                 : (mHoodControlState == HoodControlState.MOTION_MAGIC ? nativeUnitsToDegree(mPeriodicIO.demand) : 0.0));
         SmartDashboard.putBoolean("Hood At Setpoint", isAtSetpoint());
         SmartDashboard.putNumber("Calculated Degree", getCalculatedDegree());
+        SmartDashboard.putNumber("Offset Degree", getOffsetDegree());
 
         if (mCSVWriter != null) {
             mCSVWriter.write();

@@ -40,8 +40,8 @@ public class Intake extends Subsystem {
     // Motor Outputs
         // Intaking
         private double kGroundIntakeSpeed = .75;
-        private double kIndexkerIntakeSpeed = .5;
-        private double kKickerIntakeSpeed = .325;
+        private double kIndexkerIntakeSpeed = .40;
+        private double kKickerIntakeSpeed = .375;
 
         // Outtaking
         private double kGroundOuttakeSpeed = -.75;
@@ -50,15 +50,17 @@ public class Intake extends Subsystem {
 
         // Shooting
         private double kGroundShootingSpeed = 0;
-        private double kIndexerShootingSpeed = .4;
-        private double kKickerShootingSpeed = .6;
+        private double kIndexerShootingSpeed = .625;
+        private double kKickerShootingSpeed = .4;
 
     public enum IntakeSystemState {
         IDLE, 
         RELEASE,
         INTAKING,
         OUTTAKING,
-        SHOOTING
+        SHOOTING,
+        TEST,
+        SHOOTING_AUTO
     }
     
       public synchronized void setSystemState(IntakeSystemState systemState) {
@@ -92,6 +94,8 @@ public class Intake extends Subsystem {
         mTowerIndexer = new TalonSRX(Constants.kIntakeExtensionID);
         TalonUtil.checkError(mTowerIndexer.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs), "Could not config cactus intake voltage comp saturation");
         mTowerIndexer.enableVoltageCompensation(true);
+        mTowerIndexer.setInverted(InvertType.None);
+
 
         mTowerKicker = new TalonSRX(Constants.kShooterIndexerID);
         TalonUtil.checkError(mTowerKicker.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs), "Could not config cactus intake voltage comp saturation");
@@ -137,7 +141,7 @@ public class Intake extends Subsystem {
                         break;
                     case RELEASE:
                         mPeriodicIO.ground_demand = 0;
-                        mPeriodicIO.indexer_demand = 1;
+                        mPeriodicIO.indexer_demand = -1;
                         mPeriodicIO.kicker_demand = 0;
                         break;
                     case INTAKING:
@@ -165,9 +169,31 @@ public class Intake extends Subsystem {
                         mPeriodicIO.kicker_demand = kKickerOuttakeSpeed;                           
                         break;
                     case SHOOTING:
-                        mPeriodicIO.ground_demand = kGroundShootingSpeed;
-                        mPeriodicIO.indexer_demand = kIndexerShootingSpeed;
-                        mPeriodicIO.kicker_demand = kKickerShootingSpeed;                           
+                        if(!getTopBeamBreak() && !getBottomBeamBreak()){
+                            mPeriodicIO.ground_demand = kGroundShootingSpeed;
+                            mPeriodicIO.indexer_demand = 0;
+                            mPeriodicIO.kicker_demand = kKickerShootingSpeed;   
+                        }else{
+                            mPeriodicIO.ground_demand = kGroundShootingSpeed;
+                            mPeriodicIO.indexer_demand = kIndexerShootingSpeed;
+                            mPeriodicIO.kicker_demand = kKickerShootingSpeed;   
+                        }
+                        break;
+                    case SHOOTING_AUTO:
+                        if(!getTopBeamBreak() && !getBottomBeamBreak()){
+                            mPeriodicIO.ground_demand = kGroundIntakeSpeed;
+                            mPeriodicIO.indexer_demand = 0;
+                            mPeriodicIO.kicker_demand = kKickerShootingSpeed;   
+                        }else{
+                            mPeriodicIO.ground_demand = kGroundIntakeSpeed;
+                            mPeriodicIO.indexer_demand = kIndexerShootingSpeed;
+                            mPeriodicIO.kicker_demand = kKickerShootingSpeed;   
+                        }
+                        break;
+                    case TEST:
+                        mPeriodicIO.ground_demand = 0;
+                        mPeriodicIO.indexer_demand = 1;
+                        mPeriodicIO.kicker_demand = 1;                           
                         break;
                     default:
                         System.out.println("Unexpected intake system state: " + mIntakeSystemState);
@@ -188,6 +214,8 @@ public class Intake extends Subsystem {
         mTowerIndexer.set(ControlMode.PercentOutput, 0.0);
         mTowerKicker.set(ControlMode.PercentOutput, 0.0);
     }
+
+
 
     public synchronized boolean getTopBeamBreak() {
         return mTopIndexerBeamBreak.get();

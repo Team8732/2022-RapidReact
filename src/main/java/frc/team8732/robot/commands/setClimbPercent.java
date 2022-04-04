@@ -6,19 +6,19 @@ package frc.team8732.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.team8732.robot.subsystems.Climb;
-import frc.team8732.robot.subsystems.Climb.ClimbSystemState;
 
-public class setClimbSystemState extends CommandBase {
-  /** Creates a new setIntakeSystemState. */
+public class setClimbPercent extends CommandBase {
+  /** Creates a new setClimbInches. */
   Climb mClimb = Climb.getInstance();
-  ClimbSystemState systemState;
-  public setClimbSystemState(ClimbSystemState systemState) {
-    this.systemState = systemState;
+  double output;
+  public setClimbPercent(double output) {
+    // Use addRequirements() here to declare subsystem dependencies.
+    this.output = output;
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {mClimb.setSystemState(systemState);}
+  public void initialize() {mClimb.setOpenLoop(output);}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
